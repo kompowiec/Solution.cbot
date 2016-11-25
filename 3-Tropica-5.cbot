@@ -1,0 +1,61 @@
+extern boid object::Tropica5()
+{
+int item;
+int errcode;
+
+if(category ==WheeledGrabber)
+{
+item = radar(Titanium);
+goto(item.position);
+grab();
+goto(space(position));
+drop();
+turn(-5);
+
+message("Titanium loaded - create converter");
+
+
+message("Converter is powered.");
+
+	for(i = 0; i < 2; i++)
+	{
+	item = radar(TitaniumOre);
+	errcode = goto(item.position);
+	while(errcode != 0)
+
+
+	if(item == null) message("Waiting for Converter to be build.");
+	item = radar(Converter);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	errcode = drop();
+	while(errcode != 0)
+	}
+
+grab();
+	
+item = radar(BotFactory);
+if(item == null) message("Waiting for Botfactory to be build.");
+while(item == null) item = radar(BotFactory);
+errcode = goto(item.position);
+while(errcode != 0)
+drop();
+	message("Titanium loaded into BotFactory");
+		item = radar(PowerCell);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		grab();
+}
+	else
+	{
+		move(-5);
+		
+		item = radar(BlackBox);
+		goto(item.position);
+		grab();
+		
+		item = radar(SpaceShip);
+		goto(item.position);
+		drop();
+	}
+}

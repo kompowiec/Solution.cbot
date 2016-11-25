@@ -1,9 +1,9 @@
-extern void object::tropica3()
+extern void object::Tropica3()
 {
 object item;
-int errcode = 0;
+int errcode;
 errmode(0);
-//create converter
+
 	if(category ==WingedGrabber)
 	{		
 	item = radar(PowerCell); 
@@ -70,5 +70,6 @@ message("Researchcenter is powered.");
 		fire(0.1);
 		while(energyCell.energyLevel < 1) wait(0.5);
 	}
+	message(category + ": Mission complete.");
 }
-
+}
