@@ -1,0 +1,17 @@
+1) Zbuduj fabrykę robotów.
+2) Zbuduj transporter latający.
+3) Zanieś kostkę tytanu na najwyższy punkt.
+4) Zbuduj tam radar.
+5) Zbuduj centrum badawcze obok statku kosmicznego.
+6) Rozpocznij <program badawczy wieży obronnej> D.
+7) Zbuduj wieżę obronną obok radaru.
+8) Gdy zostaną zniszczone wszystkie robale możesz wrócić na statek kosmiczny i odlecieć.
+
+1) Build a bot factory.
+2) Produce a winged grabber.
+3) Carry a titanium cube to the highest point.
+4) Build a radar on the spot.
+5) Build a research center next to the spaceship.
+6) Initiate the <defense tower research program> D.
+7) Build the defense tower next to the radar.
+8) When all the worms are destroyed, you can go back to your ship and take off

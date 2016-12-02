@@ -1,0 +1,58 @@
+extern void object::MoonBlackBox()
+{
+	object item;
+	int errcode;
+	
+	errmode(0);
+	
+	if(category == WheeledGrabber)
+	{
+		item = radar(WingedGrabber,0,360,0,100);
+		message("Waiting for WingedGrabber to leave");
+		while(item != null) item = radar(WingedGrabber,0,360,0,100);
+		
+		item = radar(PowerStation);
+		goto(item.position);
+		while(energyCell.energyLevel < 1) wait(0.5);
+		
+		item = radar(SpaceShip);
+		goto(item.position);
+		message("Making room for the WingedGrabber");
+		item = radar(TitaniumOre,0,360,0,10);
+		while(item != null)
+		{
+			goto(item.position);
+			grab();
+			goto(space(item.position));
+			drop();
+			item = radar(SpaceShip);
+			goto(item.position);
+			item = radar(TitaniumOre,0,360,0,10);
+		}
+	}
+	else
+	{
+		item = radar(PowerStation);
+		
+		message("Looking for PowerStation");
+		while(item == null) item = radar(PowerStation);
+		errcode = goto(item.position);
+		while(errcode != 0)
+		{
+			turn(direction(item.position));
+			move(distance2d(position, item.position));
+			errcode = goto(item.position);
+		}
+		while(energyCell.energyLevel < 1) wait(0.5);
+		message("Going to get the BlackBox now");
+		item = radar(BlackBox);
+		goto(item.position);
+		grab();
+		item = radar(SpaceShip);
+		goto(item.position);
+		drop();
+	}
+	message(category + ": Mission Complete.");
+}
+
+
