@@ -61,15 +61,12 @@ extern void object::MoonOre()
 		
 		move(-6);
 		
-
 		if(item != null)
 		{
 			errcode = goto(item.position);
 			while(errcode != 0) errcode = goto(item.position);
-			grab();
 			errcode = goto(space(position));
 			while(errcode != 0) errcode = goto(space(position));
-			drop();
 		}
 		message("Waiting for ore to be delivered.");
 		while(i < 4)
