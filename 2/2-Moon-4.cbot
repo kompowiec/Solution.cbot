@@ -2,57 +2,51 @@ extern void object::MoonBlackBox()
 {
 	object item;
 	int errcode;
-	
 	errmode(0);
 	
 	if(category == WheeledGrabber)
+{
+	item = radar(TitaniumOre);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	grab(); 
+
+	item = radar(Converter); 
+	if(item == null) message("Waiting to building Converter");
+	while(item == null) item = radar(ResearchCenter);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	drop(); 
+	move(-2.5);
+
+	//while(item == null) item = radar(Titanium); 
+	//errcode = goto(item.position);
+	//grab();
+	//errcode = goto(space(position));
+	//drop(); 
+	message("Waiting to building RadarStation");
+
+	while(item == null) item = radar(PowerStation); 
+	errcode = goto(item.position);
+	while ( energyCell.energyLevel < 1 )
 	{
-		item = radar(WingedGrabber,0,360,0,100);
-		message("Waiting for WingedGrabber to leave");
-		while(item != null) item = radar(WingedGrabber,0,360,0,100);
-		
-		item = radar(PowerStation);
-		goto(item.position);
-		while(energyCell.energyLevel < 1) wait(0.5);
-		
-		item = radar(SpaceShip);
-		goto(item.position);
-		message("Making room for the WingedGrabber");
-		item = radar(TitaniumOre,0,360,0,10);
-		while(item != null)
-		{
-			goto(item.position);
-			grab();
-			goto(space(item.position));
-			drop();
-			item = radar(SpaceShip);
-			goto(item.position);
-			item = radar(TitaniumOre,0,360,0,10);
-		}
+		wait(1); 
 	}
-	else
-	{
-		item = radar(PowerStation);
-		
-		message("Looking for PowerStation");
-		while(item == null) item = radar(PowerStation);
+
+		while(item == null) item = radar(SpaceShip);
 		errcode = goto(item.position);
-		while(errcode != 0)
-		{
-			turn(direction(item.position));
-			move(distance2d(position, item.position));
-			errcode = goto(item.position);
-		}
-		while(energyCell.energyLevel < 1) wait(0.5);
-		message("Going to get the BlackBox now");
+		drop();
+}
+	else if(category == WingedGrabber)
+	{
+		move(-5);
 		item = radar(BlackBox);
 		goto(item.position);
 		grab();
+
 		item = radar(SpaceShip);
 		goto(item.position);
 		drop();
 	}
 	message(category + ": Mission Complete.");
 }
-
-
