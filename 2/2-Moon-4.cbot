@@ -1,52 +1,81 @@
 extern void object::MoonBlackBox()
 {
 	object item;
-	int errcode;
+	int i = 0;
+	float range = 0;
+	int errcode = 0;
+	
 	errmode(0);
 	
 	if(category == WheeledGrabber)
 {
+//1) Z jedynej dostępnej kostki tytanu zbuduj hutę
+	item = radar(TitaniumOre);
+	goto(item.position);
+	grab(); 
+
+//2) Umieść porcję rudy tytanu na środku platformy huty
+
+	item = radar(Converter);
+	if(item == null) message("Waiting to building Converter");
+	while(item == null) item = radar(Converter);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	drop();
+	move(-2.5);
+
+
+//3)Z powstałej kostki tytanu zbuduj stację energetyczną
+
+//5)Umieść transportey na środku platformy stacji energetycznej aby je doładować
+	item = radar(PowerStation);
+	if(item == null) message("Waiting for PowerStation to be built.");
+	while(item == null) item = radar(PowerStation);
+	errcode = goto(item.position);
+	while(errcode != 0)
+		while ( energyCell.energyLevel < 1 )
+		{
+			wait(1); 
+		}
+
+//4)Zbuduj radar a czarna skrzynka pojawi się na mapce
+
 	item = radar(TitaniumOre);
 	errcode = goto(item.position);
 	while(errcode != 0) errcode = goto(item.position);
 	grab(); 
 
-	item = radar(Converter); 
-	if(item == null) message("Waiting to building Converter");
-	while(item == null) item = radar(ResearchCenter);
+	item = radar(Converter);
+	while(item == null) item = radar(Converter);
 	errcode = goto(item.position);
 	while(errcode != 0) errcode = goto(item.position);
-	drop(); 
+	drop();
 	move(-2.5);
 
-	//while(item == null) item = radar(Titanium); 
-	//errcode = goto(item.position);
-	//grab();
-	//errcode = goto(space(position));
-	//drop(); 
-	message("Waiting to building RadarStation");
+	item = radar(SpaceShip);
+	goto(item.position);
 
-	while(item == null) item = radar(PowerStation); 
-	errcode = goto(item.position);
+//TO THIS MOMENT HERE APP WOKRS FINE
+}
+	else
+	{
+	item = radar(PowerStation); 
+	goto(item.position);
 	while ( energyCell.energyLevel < 1 )
 	{
 		wait(1); 
 	}
-
-		while(item == null) item = radar(SpaceShip);
-		errcode = goto(item.position);
-		drop();
-}
-	else if(category == WingedGrabber)
-	{
-		move(-5);
+//6)Użyj transportera latającego do dostarcznenia czarnej skrzynki na statek kosmiczny
+//7)Zabierz ze sobą statek kosmiczny, transportery i czarną skrzynkę
 		item = radar(BlackBox);
 		goto(item.position);
 		grab();
 
+//8)odleć
 		item = radar(SpaceShip);
 		goto(item.position);
 		drop();
 	}
 	message(category + ": Mission Complete.");
 }
+

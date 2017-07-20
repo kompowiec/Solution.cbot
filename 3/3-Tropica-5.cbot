@@ -62,4 +62,5 @@ extern void object::Tropica5()
 		goto(item.position);
 		drop();
 	}
+	message(category + ": Mission Complete.");
 }
