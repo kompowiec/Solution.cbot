@@ -6,10 +6,26 @@ extern void object::Tropica3()
 	
 	if(category ==WingedGrabber)
 	{
+	item = radar(Titanium);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	grab(); 
+
 		item = radar(PowerCell); 
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);
+		grab();
 		
+	item = radar(PowerStation);
+	if(item == null) message("Waiting for PowerStation to be built.");
+	while(item == null) item = radar(PowerStation);
+	errcode = goto(item.position);
+	while(errcode != 0)
+	while ( energyCell.energyLevel < 1 )
+	{
+		wait(1);            // wait until recharged
+	}
+
 		item = radar(ResearchCenter);
 		if(item == null) message("Waiting for Researchcenter to be built.");
 		while(item == null) item = radar(ResearchCenter);
@@ -18,14 +34,11 @@ extern void object::Tropica3()
 		drop();
 		
 		message("Researchcenter is powered.");
-		item = radar(Titanium);
-		errcode = goto(item.position);
-		while(errcode != 0)
-		{
-			item = radar(Titanium);
-			errcode = goto(item.position);
-		} 
-		grab();
+
+	item = radar(Titanium);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	grab(); 
 		
 		item = radar(BotFactory);
 		if(item == null) message("Waiting for Botfactory to be built.");
@@ -54,14 +67,8 @@ extern void object::Tropica3()
 		while(errcode != 0) errcode = goto(item.position);
 		drop();
 	}
-	else
+	else if(category ==WingedShooter)
 	{
-		item = radar( );
-		goto(item.position);
-		
-		item = radar( );
-		goto(item.position);
-		
 		while(item != null)
 		{
 			item = radar(AlienAnt,0,360,100,1000);
