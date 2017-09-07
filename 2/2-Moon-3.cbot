@@ -1,0 +1,13 @@
+//IT"S PROPOTYPE!! ACTUALLY TOUCH ONE OBJECT
+extern void object::MoonOre()
+{
+	object item;
+	int i = 0;
+		
+		for(i = 0; i < 14; i++)
+	{
+			item = radar(Target2);
+			goto(item.position);
+	}
+	message(category + ": Mission Complete.");
+}
