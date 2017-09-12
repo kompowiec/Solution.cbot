@@ -1,0 +1,87 @@
+//
+// rename as Society.txt
+//
+// Copy this program to BOTH directories,
+// "program" and "script"
+//
+
+extern void object::Society( )
+{
+	if (category == AlienAnt)
+	    BehaveAsAnt ();
+	
+	object ship  = radar (SpaceShip);
+	int    nAnts = 10;
+	
+	for (int i = 0; i < nAnts; i++) {
+		point p;
+		float ang = i * 360 / nAnts;
+		
+		p.x = ship.position.x + 25 * cos (ang);
+		p.y = ship.position.y + 25 * sin (ang);
+		p.z = topo (p);
+		
+		produce (p, 0, AlienAnt, "Society.txt");
+	}
+}
+
+// Each ant tries to follow the nearest one
+
+void object::BehaveAsAnt ()
+{
+	float  h;
+	point  lastPos;
+	
+	for (;;) {
+		h = ChooseHeading (); // 1 = left, 0 = right, 0.5 = front
+		
+		if (h < 0.5)
+		    motor (1, 1 - (0.5 - h));
+		else
+		    motor (1 - (h - 0.5), 1);
+		
+		lastPos = position;
+		wait (0.2 + rand ());
+		
+		if (distance (position, lastPos) < 0.1) {    // collision
+			motor (1, -rand ());
+			wait (1);
+		}
+	}
+}
+
+float object::ChooseHeading ()
+{
+	object target = radar (0, 0, 180);    // anything in front of me
+	point  p;
+	float  dir;
+	float  soc = 0.8;      // sociability (0..1)
+	
+	if (target == null)
+	    return rand ();    // no one - I lead
+	
+	p = target.position;
+	
+	if (target.category == TitaniumOre)
+	    return Heading (p);
+	
+	wait (0.2);
+	if (distance (p, target.position) < 0.01)
+	    return rand ();    // doesn't move - uninteresting
+	
+	// back of other ant
+	p.x = target.position.x - 3 * cos (target.orientation);
+	p.y = target.position.y - 3 * sin (target.orientation);
+	p.z = topo (p);
+	
+	return (1 - soc) * rand () + soc * Heading (p);
+}
+
+// heading:
+// 1 = left, 0 = right, 0.5 = front
+
+float object::Heading (point p)
+{
+	return (sin (direction (p)) + 1) / 2;    // 0..1
+}
+

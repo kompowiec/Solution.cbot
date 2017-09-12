@@ -1,0 +1,92 @@
+// Program makes shooters aim at a target.
+
+// Tries to predict where the target is located
+// when the 'bullet' reaches it (deflection shooting).
+
+// Also, it compensates for the pitch the vehicle has.
+// After all, aim() adjusts relative to the vehicle!
+
+// The gun is approximately 1.5 m. above 'position.z'.
+// This is compensated for as well.
+
+// There is a function that calculates if there is Line
+// of Sight (LOS).
+
+extern void object::Aim()
+{
+	object item;
+	float
+	  dist,
+	  dir,
+	  angle,
+	  oldangle,
+	  aimangle,
+	  bearing,
+	  oldbearing,
+	  xdefl,
+	  ydefl,
+	  deflconst = 0.15;
+	
+	item = radar(Me);  // Whatever you are aiming for.
+	
+	// Initialization of variables 'oldbearing' and 'oldangle'.
+	dist = distance2d(position, item.position);
+	dir = direction(item.position);
+	oldbearing = dir + orientation;
+	oldangle = atan((item.position.z - position.z - 1.5) / dist);
+	
+	while (true)
+	{
+		// Calculate distance, direction, bearing and angle.
+		// Bearing: (east = 0, north = 90, ...)
+		dist = distance2d(position, item.position);
+		dir = direction(item.position);
+		bearing = dir + orientation;
+		// Gun is 1.5 meters above 'position.z'
+		angle = atan((item.position.z - (position.z + 1.5)) / dist);
+		
+		// Deflection angles.
+		xdefl = bearing - oldbearing;
+		// Some arithmetic when target has crossed east-line.
+		if (xdefl < -180) xdefl += 360;
+		if (xdefl > 180) xdefl -= 360;
+		// If the target is further away, more deflection is neccesary,
+		// because the 'bullet' takes longer to reach the target.
+		// Hence '* dist'.
+		// Experiment with deflection constant, 0.15 works for me.
+		xdefl *= (dist * deflconst);
+		ydefl = (angle - oldangle) * dist * deflconst;
+		
+		// Prepare variables for next pass.
+		oldbearing = bearing;
+		oldangle = angle;
+		
+		// Compensate for deflection and pitch of craft.
+		turn(dir + xdefl);
+		aimangle = angle - pitch + ydefl;
+		aim(aimangle);
+		
+		// If all is well, fire.
+		if (dist < 40 && aimangle > -25 && aimangle < 15 && CheckLOS(item) == 1)
+		{
+			fire(0.05);
+		}
+	}
+}
+
+int object::CheckLOS(object target)
+{
+	point midway;
+	
+	// Calculate the point halfway to the target.
+	midway.x = (position.x + target.position.x) / 2;
+	midway.y = (position.y + target.position.y) / 2;
+	midway.z = (position.z + 1.5 + target.position.z) / 2;
+	
+	// See if there is 'ground' there.
+	if (topo(midway) < midway.z)
+	  return 1;  // There is LOS
+	else
+	  return 0;  // Ther is no LOS
+}
+

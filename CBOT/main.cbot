@@ -1,0 +1,68 @@
+extern void object::main()
+{
+	object item;
+	int i=0;
+	item = retobject(i);
+	//item =newradar(PhazerShooter,0,360,0,1000,1);
+	//goto(space(item.position));
+	
+	while(true)
+	{
+		//goto(space(item.position));
+		message(item.category);
+		wait(0.2);
+		i++;
+		item = retobject(i);
+	};
+	
+}
+
+
+
+public object object::newradar(int category, float angle, float focus, float min, float max,float way)
+{
+	ipf(1800);
+	object currect=retobject(0);
+	object itemx=null;
+	int i=0;
+	int needdistance;
+	bool checkfornomtems = false; //1 to check for no possition items //else don't
+	if (way == -1)
+	{
+		needdistance = min - 0.01;
+	}
+	else needdistance = max + 0.01;
+	
+	do
+	{
+		i++; 
+		if(currect.category == category)
+		{
+			if((position.x != nan) or (checkfornomtems == true))
+			{
+				float dis = direction(currect.position) - angle;
+				if (dis < 0)
+				{
+					dis = -dis; 
+				}
+				if (dis > 180)
+				{
+					dis = 360 - dis;
+				}
+				if((distance(this.position,currect.position) >= min) && (distance(this.position,currect.position) <= max) && ( (distance(this.position,currect.position) * way) < (needdistance * way))  && (dis <= focus /2) )
+				{
+					
+					itemx=currect;
+					needdistance = distance(this.position,currect.position);
+					
+				}
+			}
+		}
+		currect=retobject(i);
+		
+	}
+	while(currect != null);
+	ipf(200);
+	return itemx;
+}
+

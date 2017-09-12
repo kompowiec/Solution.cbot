@@ -1,0 +1,54 @@
+// FieldRefuel -- The purpose of this program is to extend the
+// range of attack bots. It takes them too much energy to get
+// out in the field to have to go back and refuel, so I just
+// let them run as they will and have this program running on
+// a dedicated bot all the time.
+//
+// It runs in conjunction with a public function I have on all
+// my bots called FlatGround - when their energy level gets below
+// 1/4, they look for the nearest flat spot at least 50 meters
+// away from all enemies and goes to sit there to wait for
+// refuelling. This prevents the refuel bot from sliding off a
+// hillside and botching the switch.
+//
+// The bot that runs this sits at the power station, and when a
+// bot gets to 1/4 energy it goes out to its position. The 2nd
+// goto(bot.position) is to compensate for movement between the
+// time that it hit the low power mark and found flat ground.
+//
+// It goes out to the downed bot, swaps cells (it assumes the
+// fuel bot is holding 1 full cell at all times), and refuels.
+// When it's done, it pulls back off the pad to make room for
+// others.
+
+extern void object::FieldRefuel()
+{
+	
+	object power=radar(PowerStation);
+	object bot=radar(TrackedShooter); //only watches 1 bot
+
+	errmode(0);	//don't exit on errors
+	
+	while(true)	//infinite loop
+	{
+		while(bot.energyCell.energyLevel < 0.26) //1/4 energy
+		{
+			goto(bot.position);
+			wait(1);
+			goto(bot.position);	//movement correction
+			drop(Behind);		//switch cells
+			grab();
+			turn(90);
+			drop();
+			turn(-90);
+			grab(Behind);
+			drop();
+			turn(90);
+			grab();
+			goto(power.position);	//refuel
+			wait(7);
+			move(-5);
+		}
+	}
+}
+

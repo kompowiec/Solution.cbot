@@ -1,0 +1,254 @@
+// (c) Minhiriath Condravox 2002
+// Harvests a number of categories of objects and stores them at 
+// predetermined storage sites.
+// Automatically restores energy if drops below fENERGYLOW.
+// Automatically repairs shields if drops below fSHIELDLOW.
+extern void object::Harvest()
+{
+	float fSHIELDLOW=0.50, fENERGYLOW=0.25;
+	int iDROPTURN = 4, iMAXHARVESTPRG = 4;
+	
+	int iHarvestPRG[iMAXHARVESTPRG][3], i=0;
+	iHarvestPRG[i][0] = Titanium;
+	iHarvestPRG[i][1] = SpaceShip;
+	iHarvestPRG[i++][2] = 15;
+	iHarvestPRG[i][0] = PowerCell;
+	iHarvestPRG[i][1] = PowerStation;
+	iHarvestPRG[i++][2] = 5;
+	iHarvestPRG[i][0] = NuclearCell;
+	iHarvestPRG[i][1] = PowerStation;
+	iHarvestPRG[i++][2] = 5;
+	iHarvestPRG[i][0] = TitaniumOre;
+	iHarvestPRG[i][1] = Converter;
+	iHarvestPRG[i++][2] = 5;
+	int iHarvestPRGNr = 1;
+	
+	object oHarvestItem;
+	int iErrCode, iCount, iNrHarvests = 0;
+	boolean bPaused = false;
+	
+	while (true)
+	{
+		// Check energy and shields
+		if ( CheckAndRepowerEnergy(fENERGYLOW) > 0) { break; }
+		if ( CheckAndRepowerShields(fSHIELDLOW) > 0) { break; }
+		
+		// Find closest harvest item at at least range x from store site and get it
+		oHarvestItem = FindHarvestObject(iHarvestPRG[iHarvestPRGNr][0], iHarvestPRG[iHarvestPRGNr][1], iHarvestPRG[iHarvestPRGNr][2]);
+		
+		if ( oHarvestItem!=null )
+		{
+			// Go to harvest item
+			errmode(0);
+			if ( goto(oHarvestItem.position, 10)<1 )
+			{
+				// Grab 
+				if (grab(InFront)==0) { iNrHarvests++; }
+				else { message("Harvester bot couldn't get object!", DisplayError); }
+				errmode(1);
+				
+				// Recheck if there is a object held
+				if (load != null)
+				{
+					if ( CheckAndRepowerEnergy(fENERGYLOW) > 0) { break; }
+					if ( CheckAndRepowerShields(fSHIELDLOW) > 0) { break; }
+					
+					// find store site and return to it with object
+					if ( FindAndMoveToObject(iHarvestPRG[iHarvestPRGNr][1], 0, iHarvestPRG[iHarvestPRGNr][2])>0 )
+					{
+						message("Harvester bot unable to reach store site!", DisplayError);
+						break;
+					}
+					
+					// Wait for power or nuclear cell to reload
+					if ((iHarvestPRG[iHarvestPRGNr][1]==PowerStation) && ((load.category==PowerCell) || (load.category==NuclearCell)))
+					    { while (load.energyLevel < 1.0); }
+					
+					// Try to drop object or rotate until empty spot found
+					DropItem();
+					
+					// Take distance while converting TitaniumOre and get Titanium out
+					if ( (iHarvestPRG[iHarvestPRGNr][0]==TitaniumOre) && (iHarvestPRG[iHarvestPRGNr][1]==Converter) )
+					{
+						move(-3); wait(15); 
+						move(3);  grab();  
+						turn(180);  move(6);
+						DropItem();
+					}
+				}
+			}
+			else
+			{
+				message(oHarvestItem.position+" from "+position+"!", DisplayError);
+				break;
+			}
+			errmode(1);
+		}
+		else
+		{
+			// Display amount of type harvested.
+			if (iNrHarvests > 0)
+			{
+				message("Harvested total of "+iNrHarvests+" "+iHarvestPRG[iHarvestPRGNr][0]+".");
+				wait(2);
+			}
+			
+			// Start harvesting next type
+			iHarvestPRGNr++;
+			if (iHarvestPRGNr >= iMAXHARVESTPRG)
+			{
+				iHarvestPRGNr = 0;
+			}
+			message("Switched to harvesting "+iHarvestPRG[iHarvestPRGNr][0]+".");
+			iNrHarvests = 0;
+		}
+	}
+	message("Harvester bot stopped harvesting!", DisplayError);
+}
+
+// Find nearest object of category iDestCat and move towards object if found.
+// Doesn't move if destination is less than iMinRange away.
+// Returns error codes : 
+// 0    object found and reached
+// 1    object found but not reached
+// 2    object not found
+int object::FindAndMoveToObject(int iDestCat, int iMinRange, int iMinDist)
+{
+	int iErrCode = -1;
+	object oDest;
+	
+	errmode(0);
+	if ( (oDest = radar(iDestCat, 0, 360, iMinRange)) != null)
+	{
+		if ( distance2d(position, oDest.position)>iMinDist )
+		{
+			if ( goto(oDest.position, 10) == 0) { iErrCode = 0; }
+			else                                { iErrCode = 1; }
+		}
+		else { iErrCode = 0; }
+	}
+	else { iErrCode = 2; }
+	errmode(1);
+	
+	return(iErrCode);
+}
+
+// Checks bot energy cell power level and repowers at nearest PowerStation if 
+// dropped below fEnergyLow.
+// Returns error codes:
+// -1    energy above fEnergyLow
+//  0    energy restored successfully
+//  1    energy needs restoring but couldn't reach PowerStation
+//  2    energy needs restoring but no PowerStation found
+int object::CheckAndRepowerEnergy(float fEnergyLow)
+{
+	object oPowerStation;
+	int iErrCode=-1;
+	
+	// Automatically repower energy if low
+	if (energyCell.energyLevel < fEnergyLow)
+	{
+		message("Harvester bot recharging.");
+		
+		iErrCode = FindAndMoveToObject(PowerStation, 0, 0);
+		switch (iErrCode)
+		{
+			case 0 :
+			    while (energyCell.energyLevel < 1.0);
+			    break;
+			case 1 :
+			    message("Harvester bot en route to PowerStation - can't get there!", DisplayWarning);
+			    FindAndMoveToObject(SpaceShip, 0, 5);
+			    break;
+			case 2 :
+			    message("Harvester bot recharging - can't find PowerStation!", DisplayWarning);
+			    FindAndMoveToObject(SpaceShip, 0, 5);
+			    break;
+		}
+	}
+	
+	return (iErrCode);
+}
+
+// Checks bot shields and repowers at nearest RepairCenter if dropped below fShieldLow.
+int object::CheckAndRepowerShields(float fShieldLow)
+{
+	object oRepairCenter;
+	int iErrCode=-1;
+	
+	// Auto repair if shield low
+	if (shieldLevel < fShieldLow)
+	{
+		message("Harvester bot repairing!", DisplayWarning);
+		
+		iErrCode = FindAndMoveToObject(RepairCenter, 0, 0);
+		switch (iErrCode)
+		{
+			case 0 :
+			    while (shieldLevel < 1.0);
+			    break;
+			case 1 :
+			    message("Harvester bot en route to RepairCenter - can't get there!", DisplayWarning);
+			    FindAndMoveToObject(SpaceShip, 0, 5);
+			    break;
+			case 2 :
+			    message("Harvester bot recharging - can't find RepairCenter!", DisplayWarning);
+			    FindAndMoveToObject(SpaceShip, 0, 5);
+			    break;
+		}
+	}
+	
+	return (iErrCode);
+}
+
+// Find nearest harvestable iFindCat object at least fStoreSize away from iStoreSiteCat
+object object::FindHarvestObject(int iFindCat, int iStoreSiteCat, float fStoreSize)
+{
+	object oStoreSite=radar(iStoreSiteCat), oFind;
+	int iMinDist = 0;
+	
+	if (oStoreSite!=null)
+	{
+		do
+		{
+			oFind = radar(iFindCat, 0, 360, iMinDist);
+			if (oFind!=null)
+			{
+				if ( distance2d(oStoreSite.position, oFind.position)<fStoreSize )
+				{
+					oFind=null;
+					iMinDist++;
+				}
+			}
+			else { break; }
+		} while ( (oFind==null) && (iMinDist < 1000) );
+	}
+	else
+	{
+		message("Can't store at "+iStoreSiteCat+" - not present.");
+		oFind=null;
+	}
+	
+	return (oFind);
+}
+
+// Try to drop object or rotate until empty spot found
+void object::DropItem()
+{
+	int iDROPTURN = 1;
+	int iCount = 0, iErrCode = -1;
+	
+	errmode(0);
+	while ( (drop(InFront) > 0) & (iCount <360) ) 
+	{ 
+		turn(iDROPTURN); 
+		iCount += iDROPTURN;
+		if (iCount >= 360)
+		{
+			message("Harvester bot unable to drop object!", DisplayError);
+			iCount = 0;
+		}
+	}
+	errmode(1);
+}
+

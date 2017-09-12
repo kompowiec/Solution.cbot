@@ -1,0 +1,296 @@
+=========================================================================================================
+
+...On my latest mission to a previously explored planet i ran across a race of abandoned robots, in 
+   return of being left alone they gave me information about undocumented instructions and mechanism of
+   the bots.
+
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+
+   Syntax :
+   
+-- float/int abs(float/int variable)  Returns absolute value of variable. e.a. always positive.
+
+   example x = -1;
+           abs(x);
+           message(x);
+
+---------------------------------------------------------------------------------------------------------
+
+   Syntax :
+
+-- boolean   Same as bool.
+  
+   If you want a function to return a boolean only the latter is recognized.
+  
+   example :: boolean object::energyLow()
+             {
+                if (energyCell.energyLevel < 0.1)
+                {
+                   return true;
+                }
+                return false;
+             }
+             
+---------------------------------------------------------------------------------------------------------
+
+   Syntax :
+   
+-- boolean && boolean   Returns true if both bools are true, else false.
+-- boolean || boolean   Returns false when both bools are false, else true. e.a. inversion of &&.
+-- !boolean   Returns the inversion of the bool. e.a. !true = false, !false = true.
+
+   example :: object target;
+              target = radar(PowerStation);
+              if (energyCell.energyLevel < 0.1 && energyCell.category == PowerCell)
+              {
+                 goto(target.position);
+              }
+              
+---------------------------------------------------------------------------------------------------------
+
+   Syntax :
+
+-- variable++   Increases variable by one after instruction.
+-- variable--   Decreases variable by one after instruction.
+   
+   Use x++ instead of x = x + 1 and x-- instead of x = x - 1. This works on both int and float variables.
+   
+   note -- If the variable is read in the same instruction, the variable will return the old value. 
+           example: int x = 0; message(x++); This will prompt 0 instead of 1.
+   
+   example :: for (int x = 0, y = 10; x < y; x++)
+
+---------------------------------------------------------------------------------------------------------
+   
+   Syntax :
+   
+-- ipf(int)  Changes linespeed to int;
+
+   You can increase the speed the bot interprets your code with this instruction, ideal for ultra
+   intensive routines. :)
+   
+   ipf(200) is more or less the normal setting...
+   
+---------------------------------------------------------------------------------------------------------
+
+   Syntax :
+   
+-- boolean/float/int/object/string variableA, variableB, variableC;
+
+   You can declare multiple variables of the same type on the same line by defining them with a ','.
+   
+   example :: int varX, varY, varZ;
+  
+   
+---------------------------------------------------------------------------------------------------------
+   
+   Syntax :
+
+-- boolean/float/int/object/string[]   Defines a array.
+   
+   You can create a array from any type of variable with [], members are addressed with a int index. 
+   e.a. variable[12] or array[3] Arrays of arrays of the same type is possible.
+   
+   example :: float array[];
+              
+              array[0] = 1.23;
+              array[1] = -4.32;
+   ---
+              int[] array, anotherArray, arrays[];
+              
+              array[0] = 1;
+              array[1] = 2;
+              anotherArray[0] = -1;
+              anotherArray[5] = 1;
+              arrays[0] = array;
+              arrays[1] = anotherArray;
+              
+   Use sizeof to get the size or maximum index of a array, ofcourse functions can also accept and return
+   arrays.
+          
+   Syntax :
+       
+-- int sizeof(array[])   Returns the size of a array or index-1.
+-- type[] functionName(type variable[])  Creates a function accepting and returning a array.        
+   
+   note -- ( this example can best be used with ipf(10000) or similar )
+   
+   example :: int[] getCategories()
+              {
+                 object Object;
+                 int typesFound[], indexFound = 0, searchIndex = 0;
+                 
+                 while (true)
+                 {
+                    Object = retobject(searchIndex);
+                    if (Object == null)
+                    {
+                       return typesFound;
+                    }
+                    if (!intExist(typesFound, Object.category))
+                    {
+                       typesFound[indexFound] = Object.category;
+                       indexFound++;
+                    }
+                    searchIndex++;
+                 }
+              }
+              
+              boolean intExist(int[] array, int target)
+              {
+                 if (sizeof(array) != 0)
+                 {
+                    for (int searchIndex = sizeof(array) - 1; searchIndex > 0 ; searchIndex--)
+                    {
+                       if (array[searchIndex] == target)
+                       {
+                          return true;
+                       }
+                    }
+                 }
+                 return false;
+              }
+ 
+   note -- You can define directly index 5, however the rest of the array 0 to 4 is also created and
+           assigned with nan.
+   
+   example :: string[] text;
+              
+              text[5] = "hello world :p";
+              
+   would actually make the array : text[0] = nan;
+   				   text[1] = nan;
+   				   text[2] = nan;
+   				   text[3] = nan;
+   				   text[4] = nan;
+   				   text[5] = "hello world :p";
+   
+---------------------------------------------------------------------------------------------------------
+
+   Syntax :
+   
+-- object radar(int[] Category, float[] Angle, float[] Focus, float[] Min, float[] Max, float[] Sens)
+
+   note -- All variable accept arrays, you may use for example a array of alien category to detect 
+           multiple kinds of alien foes at once.
+           
+   example :: object target;
+              int foes[];
+              
+              foes[0] = AlienQueen;
+              foes[1] = AlienEgg;
+              foes[2] = AlienAnt;
+              foes[3] = AlienSpider;
+              foes[4] = AlienWasp;
+              foes[5] = AlienWorm;
+              
+              target = radar(foes);
+              
+---------------------------------------------------------------------------------------------------------
+
+   Syntax :
+  
+-- object search(int preferedCategory, int x, int y)  Returns a prefered object or the nearest object
+                                                      at a specified location.
+
+   note -- the x and y ofcourse optional, however y is needed when x is specified.
+   
+---------------------------------------------------------------------------------------------------------
+
+   Syntax :
+   
+-- int produce(point Position, float Direction, int Category, string Script)
+
+   Produces objects like bots and powercells out of thin air, amazing! :) (Doesn't work on all kinds of
+   objects) Returns 0 if successful, 1 if not. A name of a script filename can be given to be runned on a
+   produced bot. example: "script.txt"
+   
+   example :: produce(position, 0, PowerCell, "");
+   
+---------------------------------------------------------------------------------------------------------
+
+   Syntax :
+   
+-- public type functionName(type variable1, type variable2, etc)
+
+   You can make a function accessible with public from another script and also from another bot!
+   
+   example :: // bot #1
+              public string indentify()
+              {
+                 return "Hi, my name is, my name is, my name is...";
+              }
+              
+              // bot #2
+              message(indentify());
+              
+---------------------------------------------------------------------------------------------------------
+
+   I know there is more i could see it in their face ;), but this is it for now, maybe ever...
+
+=========================================================================================================
+
+   Some usefull functions i wrote on those missions...
+   
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------         
+   
+-- Returns the angle to the grid from pointA to pointB. Similar to direction except direction assumes 
+   pointA to be the bots position.           
+   
+   float angle(point pointA, point pointB)
+   {
+      float offset = 90;
+      if (deltaY(pointA, pointB) > 0)
+      {
+         offset = 270;
+      }
+      return offset + atan(deltaX(pointA, pointB) / deltaY(pointA, pointB));
+   }
+
+---------------------------------------------------------------------------------------------------------
+
+   float deltaX(point origin, point target)
+   {
+      return target.x - origin.x;
+   }
+   
+---------------------------------------------------------------------------------------------------------
+
+   float deltaY(point origin, point target)
+   {
+      return target.y - origin.y;
+   }
+
+---------------------------------------------------------------------------------------------------------
+
+   Calculates a point from another point with a horizontal angle, a vertical angle and a distance.
+   
+   point triangulate(point origin, float Distance, float angleH, float angleV)
+   {
+      point dest;
+
+      dest.x = cos(angleH) * cos(angleV) * Distance;
+      dest.y = sin(angleH) * cos(angleV) * Distance;
+      dest.z = sin(angleV) * Distance;
+
+      return dest;
+   }
+   
+---------------------------------------------------------------------------------------------------------
+
+   Same as triangulate but only using  2 dimensions. (horizontal)
+   
+   point triangulate2d(point origin, float Distance, float angle)
+   {
+      point dest;
+
+      dest.x = cos(angle) * Distance;
+      dest.y = sin(angle) * Distance;
+
+      return dest;
+   }
+
+===================================================================================================1712==    
+

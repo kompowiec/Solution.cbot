@@ -1,0 +1,28 @@
+extern void object::standandfight()
+{
+	point  start;		// variable for initial position
+	object item;		// info. about Enemy
+	point enemy;		// variable for enemy position
+	float target;		// holder for range to enemy
+	
+	start = position;    	 // stores initial position x,y,z
+	while(true)           	//while enemies exists
+	{
+		item = radar(AlienAnt);  	// looks for enemy Ants in this case
+		enemy = item.position;		//store enemy position x,y,z
+		target = (distance(start, enemy));	//determin distance point to point
+		if (target < 25);		// if distance is less then 25 M 
+		{
+			turn(direction(item.position));	//face enemy
+			aim(0);		//track enemy movement
+			fire(1);	//fire 1 sec. busts
+		}
+		
+	}
+	
+	goto(start);           // comes back to initial pos.
+	message("Targets Distroyed");	//acknowlege all enemies destroyed
+	//Nexus
+	//what a great idea this game is.
+}
+

@@ -1,0 +1,240 @@
+// Name: BrainFuck Interpreter (CBOT)
+// Author: Adikso
+// Created: 17.04.2016
+
+extern void object::BrainFuck()
+{
+    
+    file handle();
+    handle.open("brainfuck.bf", "r");
+    
+    string script = "";
+    while( not handle.eof()){
+        script = script + handle.readln();
+    }
+    
+    int script_size = strlen(script);
+    
+    interpret(script, script_size);
+    
+}
+
+string getChar(int code){
+    string table = "???????????????????????????????? !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+    string r = strmid(table, code, 1);
+}
+
+string getId(string character){
+    string table = "???????????????????????????????? !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+    string r = strfind(table, character);
+}
+
+void interpret(string script, int lenght){
+
+    // --------- SETTINGS ---------
+
+    int cell_size = 8; // bit
+    int memory_array_size = 1024;
+    bool file_input = false;
+
+    bool debugging = false;
+
+
+
+    int cell_size_bound = pow(2, cell_size) - 1; // eg. 2^8 - 1 = 255
+    message("BF Interpreter init..");
+
+    // --------- DEBUGGER ---------
+    file log();
+    if(debugging){
+        log.open("log.txt", "w");
+        log.writeln("BF Interpreter init..");
+    }
+
+    // --------- FILE INPUT ---------
+    file input();
+    string file_input_content;
+    int file_input_pos = 0;
+
+    if(file_input){
+        input.open("input.txt", "r");
+        file_input_content = input.readln();
+        input.close();
+    }
+
+    // --------- MEMORY INITIALIZATION ---------
+    int memory[memory_array_size];
+    
+    // Hack
+    for(int i = 0; i < memory_array_size; i++){
+        memory[i] = 0;
+    }
+
+    
+    int Ptr = 0;  // Pointer
+    int IPtr = 0; // Position in file
+    
+    string output = "";
+    
+    while(true){
+        
+        if(IPtr >= lenght){
+            break;
+        }
+        
+        int charVal;
+        string character = strmid(script,IPtr, 1);
+        
+        if(character == ">"){
+            charVal = 1;
+        }else if(character == "<"){
+            charVal = 2;
+        }else if(character == "+"){
+            charVal = 3;
+        }else if(character == "-"){
+            charVal = 4;
+        }else if(character == "."){
+            charVal = 5;
+        }else if(character == "["){
+            charVal = 6;
+        }else if(character == "]"){
+            charVal = 7;
+        }else if(character == ","){
+            charVal = 8;
+        }else{
+            charVal = 0;
+        }
+        
+        int val = memory[Ptr];
+        
+        switch(charVal){
+            
+            case 1: // >
+                Ptr++;
+                if(Ptr == memory_array_size) Ptr = 0;
+                IPtr++;
+                break;
+            
+            case 2: // <
+                Ptr--;
+                if(Ptr == -1) Ptr = memory_array_size - 1;
+                IPtr++;
+                break;
+            
+            case 3: // +
+                if(val + 1 > cell_size_bound){
+                    memory[Ptr] = 0;
+                }else{
+                    memory[Ptr] = val + 1;
+                }
+                
+                IPtr++;
+                break;
+            
+            case 4: // -
+                if(val - 1 < 0){
+                    memory[Ptr] = cell_size_bound;
+                }else{
+                    memory[Ptr] = val - 1;
+                }
+                IPtr++;
+                break;
+            
+            case 5: // .
+                output = output + getChar(val);
+                IPtr++;
+                break;
+            
+            case 6: // [
+                if(val != 0){
+                    IPtr++;
+                    }else{
+                        int depth = 0;
+                        int i = IPtr + 1;
+                        while(i < lenght){
+                            string value = strmid(script, i, 1);
+                            if(value == "["){
+                                depth++;
+                            }else if(value == "]"){
+                                depth--;
+                            }
+                    
+                            i++;
+                    
+                            if(depth == -1){
+                                break;
+                            }
+                            
+                        }
+                
+                        if(depth != -1){
+                            message("missing pair ] at " + IPtr, DisplayError);
+                            return;
+                        }
+                
+                        IPtr = i;
+                    }
+                break;
+            
+            case 7: // ]
+                {
+                    int depth = 0;
+                    int i = IPtr - 1;
+                    while(i > 0){
+                        string value = strmid(script, i, 1);
+                        if(value == "["){
+                            depth++;
+                        }else if(value == "]"){
+                            depth--;
+                        }
+                
+                        i--;
+                
+                        if(depth == 1){
+                            break;
+                        }
+                        
+                    }
+            
+                    if(depth != 1){
+                        message("missing pair [ at " + IPtr, DisplayError);
+                        return;
+                    }
+            
+                    IPtr = i+1;
+                 }
+                break;
+
+            case 8: // ,
+                if(file_input){
+                    string character = strmid(file_input_content, file_input_pos, 1);
+                    memory[Ptr] = getId(character);
+
+                    file_input_pos++;
+                }else{
+                    message("File input is disabled. Aborting..", DisplayError);
+                    return;
+                }
+                IPtr++;
+                break;
+            
+            default:
+                IPtr++;
+            
+        }
+
+        if(debugging){
+            string memoryStr = "";
+            for(int i = 0; i < 30; i++) memoryStr = memoryStr + "|" + memory[i];
+
+            log.writeln(IPtr+">"+memoryStr);
+        }
+        
+    }
+    
+    message("Output: " + output);
+    if(debugging){
+        log.close();
+    }
+    
+}

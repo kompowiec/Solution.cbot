@@ -1,0 +1,77 @@
+extern void object::hunt3()
+{
+	object enemy=radar(AlienAnt);    //pick your target
+	int x=2;                         //Flight altitude
+	int t=0;                         //To fly or not to fly
+	
+	while(true)
+	{
+		
+		enemy=radar(AlienAnt);        //looking for a victem
+		motor(1-(direction(enemy.position)/30),1-(-direction(enemy.position)/30));    //Driving towards the victem
+		
+		// \/ \/ \/ Deciding wether or not to fly \/ \/ \/
+		if (temperature>0.75)
+		{
+			t=1;
+		}
+		if (t==1 and temperature<0.2)
+		{
+			t=0;
+		}
+		// /\ /\ /\ Decidig wether or not to fly /\ /\ /\
+		
+		
+		if (t==0)
+		{
+			jet((x-altitude)/5);    //fly x above the ground
+			
+		}
+		
+		if (t==1)
+		{
+			jet(-1);    //land
+		}
+		
+		aim(atan(((topo(enemy.position)+enemy.altitude)-(topo(position)+altitude))/distance2d(position, enemy.position)));    //aim at the target
+		
+		//\/ \/ \/ Fire at the enemy if they are in range and under the reticle \/ \/ \/
+		if((distance2d(enemy.position, position)<25) and (direction(enemy.position)<10) and (direction(enemy.position)>-10))
+		{
+			fire(0.1);
+		}
+		///\ /\ /\ Fire at the enemy if they are in range and under the reticle /\ /\ /\
+		
+		
+		maint(); //basic maintenance
+		enemy=radar(AlienAnt);
+	}
+	
+}
+
+void object::maint()
+{
+	object power=radar(PowerStation), health=radar(RepairCenter);
+	
+	if (shieldLevel<0.6 or energyCell.energyLevel<0.3)
+	{
+		goto(power.position,5);
+		while ( energyCell.energyLevel < 1 )
+		{
+			wait(1);           // waits until recharged
+		}
+		
+		goto(health.position,5);
+		while ( shieldLevel < 1 )
+		{
+			wait(1);           // waits until recharged
+		}
+		while (altitude<5)
+		{
+			jet(1);
+		}
+	}
+}
+
+//By NeBan
+

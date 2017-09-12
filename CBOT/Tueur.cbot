@@ -1,0 +1,359 @@
+extern void object::Tueur()
+{
+	object guèpe,fourmi,araignée;
+	float disg,disf,disa;
+	
+	while(true)
+	{
+		if(energyCell.energyLevel<0.2)
+		{
+			if(energyCell.category==NuclearCell)
+			{
+				RechargeAtomique();
+				break;
+			}
+			else
+			{
+				Recharge();
+			}
+		}
+		if(shieldLevel<0.8)
+		{
+			Répare();
+		}
+		if(temperature>0.8)
+		{
+			Descend();
+		}
+		
+		if(radar(AlienWasp)!=null)
+		{
+			if(radar(AlienAnt)!=null)
+			{
+				if(radar(AlienSpider)!=null)
+				{
+					message("Il y a des guèpes, des fourmis et des araignées.");
+					
+					guèpe=radar(AlienWasp);
+					fourmi=radar(AlienAnt);
+					araignée=radar(AlienSpider);
+					
+					disg=distance(position,guèpe.position);
+					disf=distance(position,fourmi.position);
+					disa=distance(position,araignée.position);
+					
+					if(disg<disf)
+					{
+						if(disg<disa)
+						{
+							Guèpes();
+						}
+						else
+						{
+							Araignées();
+						}
+					}
+					else
+					{
+						if(disf<disa)
+						{
+							Fourmis();
+						}
+						else
+						{
+							Araignées();
+						}
+					}
+				}
+				else
+				{
+					message("Il y a des guèpes, des fourmis mais pas d'araignées.");
+					
+					guèpe=radar(AlienWasp);
+					fourmi=radar(AlienAnt);
+					disg=distance(position,guèpe.position);
+					disf=distance(position,fourmi.position);
+					if(disg<disf)
+					{
+						Guèpes();
+					}
+					else
+					{
+						Fourmis();
+					}
+				}
+			}
+			else
+			{
+				if(radar(AlienSpider)!=null)
+				{
+					message("Il y a des guèpes et des araignées, mais pas de fourmis.");
+					
+					guèpe=radar(AlienWasp);
+					araignée=radar(AlienSpider);
+					disg=distance(position,guèpe.position);
+					disa=distance(position,araignée.position);
+					if(disg<disa)
+					{
+						Guèpes();
+					}
+					else
+					{
+						Araignées();
+					}
+				}
+				else
+				{
+					message("Il n'y a que des guèpes.");
+					
+					Guèpes();
+				}
+			}
+		}
+		else
+		{
+			if(radar(AlienAnt)!=null)
+			{
+				if(radar(AlienSpider)!=null)
+				{
+					message("Il y a des fourmis et des araignées, mais pas de guèpes.");
+					
+					araignée=radar(AlienSpider);
+					fourmi=radar(AlienAnt);
+					disa=distance(position,araignée.position);
+					disf=distance(position,fourmi.position);
+					if(disa<disf)
+					{
+						Araignées();
+					}
+					else
+					{
+						Fourmis();
+					}
+				}
+				else
+				{
+					message("Il n'y a que des fourmis.");
+					
+					Fourmis();
+					
+				}
+			}
+			else
+			{
+				if(radar(AlienSpider)!=null)
+				{
+					message("Il n'y a que des araignées");
+					
+					Araignées();
+					
+				}
+				else
+				{
+					message("Youpi, pas d'ennemis( peut-être des vers!)",DisplayInfo);
+					break;
+				}
+			}
+		}
+	}
+}
+void object::Guèpes()
+{
+	
+	object    chose;
+	float     angle;
+	
+	aim(0);
+	
+	while(radar(AlienWasp, 0, 360, 0, 20) == null)
+	{
+		chose = radar(AlienWasp);
+		turn(direction(chose.position));
+		motor(1,1);
+		
+		jet(0);
+		if(position.z > chose.position.z)
+		{
+			jet(-0.3);
+		}
+		
+		if(position.z < chose.position.z - 1)
+		{
+			jet(0.3);
+		}
+		
+		wait(0.2);
+	}
+	chose = radar(AlienWasp);
+	angle = direction(chose.position);
+	turn(angle);
+	if (angle < 0)
+	{
+		motor(1,0.5);
+	}
+	else
+	{
+		motor(0.5,1);
+	}
+	
+	jet(0);
+	if(position.z > chose.position.z)
+	{
+		jet(-0.3);
+	}
+	
+	if(position.z < chose.position.z - 1)
+	{
+		jet(0.3);
+	}
+	
+	fire(1);
+}
+
+void object::Fourmis()
+{
+	
+	object    chose;
+	float minus, altfin;
+	
+	aim(-20);
+	while (radar(AlienAnt, 0, 360, 0, 20) == null)
+	{
+		chose = radar(AlienAnt);
+		turn(direction(chose.position));
+		motor(1,1);
+		jet(0);
+		
+		minus=position.z-topo(position);
+		if(topo(position)<0)
+		{
+			altfin=position.z;
+		}
+		else
+		{
+			altfin=minus;
+		}
+		
+		if (altfin < 6)
+		{
+			jet(0.3);
+		}
+		
+		if (altfin > 9)
+		{
+			jet(-0.3);
+		}
+		
+		wait(0.2);
+	}
+	
+	fire(1);
+	
+}
+void object::Araignées()
+{
+	
+	object    chose;
+	
+	float altfin,minus;
+	
+	aim(-20);
+	
+	while (radar(AlienSpider, 0, 360, 0, 20) == null)
+	{
+		chose = radar(AlienSpider);
+		turn(direction(chose.position));
+		motor(1,1);
+		jet(0);
+		
+		minus=position.z-topo(position);
+		if(topo(position)<0)
+		{
+			altfin=position.z;
+		}
+		else
+		{
+			altfin=minus;
+		}
+		
+		if (altfin< 6)
+		{
+			jet(0.3);
+		}
+		
+		if (altfin> 9)
+		{
+			jet(-0.3);
+		}
+		
+		wait(0.2);
+	}
+	
+	fire(1);
+}
+
+void object::Recharge()
+{
+	object recharge;
+	if(radar(PowerStation)!=null)
+	{
+		recharge=radar(PowerStation);
+		goto(recharge.position);
+		do{}while(energyCell.energyLevel<1);
+	}
+	else
+	{
+		RechargeAtomique();
+	}
+}
+
+void object::RechargeAtomique()
+{
+	object recharge;
+	if(radar(NuclearPlant)!=null)
+	{
+		recharge=radar(NuclearPlant);
+	}
+	else
+	{
+		recharge=radar(SpaceShip);
+	}
+	goto(recharge.position);
+	message("J'ai besoin d'une autre pile atomique (ou d'une pile simple!)");
+}
+
+void object::Descend()
+{
+	float altsol;
+	if(topo(position)>0)
+	{
+		do
+		{
+			jet(-0.3);
+			altsol=position.z-topo(position);
+		}
+		while(altsol>0);
+		jet(0);
+		do{}while(temperature>0);
+	}
+	else
+	{
+		message("Il y a de l'eau sous moi, je continue ma mission, je vais peut-être tomber...");
+	}
+}
+
+void object::Répare()
+{
+	object répare;
+	if(radar(RepairCenter)!=null)
+	{
+		répare=radar(RepairCenter);
+		goto(répare.position);
+		do{}while(shieldLevel<1);
+	}
+	else
+	{
+		message("Pas de Centre de réparation, je continue");
+	}
+}
+

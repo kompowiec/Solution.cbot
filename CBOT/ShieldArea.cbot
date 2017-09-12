@@ -1,0 +1,87 @@
+extern void object::ShieldArea()
+{
+	int enemyList[];
+	int i = 0;
+	 
+	enemyList[i++] = AlienAnt;
+	enemyList[i++] = AlienWorm;
+	enemyList[i++] = AlienWasp;
+	enemyList[i++] = AlienSpider;
+	
+	object enemy;
+	object damagedAlly;
+	
+	while(true)
+	{
+		enemy = radar(enemyList,0,360,0,45);
+		
+		if(enemy != null)
+		    shield(1, 25);
+		else
+		{
+			damagedAlly = findDamagedAlly();
+			
+			if(damagedAlly != null)
+			    shield(1,distance2d(position,damagedAlly.position));
+			else
+			{
+				shield(0,0);
+				wait(1);
+			}
+		}      
+	}
+}
+
+object object::findDamagedAlly()
+{
+	int allyList[];
+	int i = 0;
+	
+	allyList[i++] = WingedGrabber;
+	allyList[i++] = TrackedGrabber;
+	allyList[i++] = WheeledGrabber;
+	allyList[i++] = LeggedGrabber;
+	allyList[i++] = WingedShooter;
+	allyList[i++] = TrackedShooter;
+	allyList[i++] = WheeledShooter;
+	allyList[i++] = LeggedShooter;
+	allyList[i++] = WingedOrgaShooter;
+	allyList[i++] = TrackedOrgaShooter;
+	allyList[i++] = WheeledOrgaShooter;
+	allyList[i++] = LeggedOrgaShooter;
+	allyList[i++] = WingedSniffer;
+	allyList[i++] = TrackedSniffer;
+	allyList[i++] = WheeledSniffer;
+	allyList[i++] = LeggedSniffer;
+	allyList[i++] = Thumper;
+	allyList[i++] = PhazerShooter;
+	allyList[i++] = Recycler;
+	allyList[i++] = Shielder;
+	allyList[i++] = Subber;
+	allyList[i++] = Derrick;
+	allyList[i++] = BotFactory;
+	allyList[i++] = PowerStation;
+	allyList[i++] = Converter;
+	allyList[i++] = RepairCenter;
+	allyList[i++] = DefenseTower;
+	allyList[i++] = ResearchCenter;
+	allyList[i++] = RadarStation;
+	allyList[i++] = ExchangePost;
+	allyList[i++] = PowerPlant;
+	allyList[i++] = AutoLab;
+	allyList[i++] = NuclearPlant;
+	
+	object damagedAlly;
+	float min = 0;
+	
+	while((damagedAlly = radar(allyList,0,360,min,25)) != null)
+	{
+		if(damagedAlly.shieldLevel < 1)
+		    return damagedAlly;
+		
+		min = distance2d(position,damagedAlly.position) + 0.5;
+	}
+	
+	return null;
+}
+

@@ -1,0 +1,42 @@
+extern void object::ServiceTower2()
+{
+	object	tower;				 // info. about tower
+	object	station;			 // info. about station
+	
+	// 1) find the defense tower
+	tower = radar(DefenseTower); // look for tower
+	
+	while ( true )				 // repeat forever
+	{
+		// 2) go to the power station to recharge
+		station = radar(PowerStation);
+		goto(station.position);  // go there
+		while ( energyCell.energyLevel < 1 )
+		{
+			wait(1);			 // wait until recharged
+		}
+		
+		// 3) go back to defense tower
+		goto(tower.position);	 // go to tower
+		
+		message( "Tower Service ready" );
+		// 4) wait until power cell is empty
+		//	   keep enough energy to go to the station
+		while ( tower.energyCell.energyLevel > 0.4 )
+		{
+			wait(1);
+		}
+		message( "Tower Service begin" );
+		
+		// 5) switch the power cells
+		grab(InFront);			 // grab the power cell
+		drop(Behind);
+		grab(EnergyCell);		  // switch the cells
+		drop(InFront);
+		grab(Behind);
+		drop(EnergyCell);		  // used cell to go to the station
+		
+		// continue to 2)
+	}
+}
+

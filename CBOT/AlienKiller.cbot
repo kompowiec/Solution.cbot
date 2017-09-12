@@ -1,0 +1,371 @@
+//    Made by Yenz
+//    Please send comments and improvments to yenz9@hotmail.com
+//    
+//    Thanks to sclover@abac.com (code to find out where to make a safe landing and
+//    errordetectingcode) and NeBen@triad.rr.com (aimingcode and motorcontrol). I
+//    changed some of the borrowed parts, but the ideas i used in those parts was theirs.
+//
+//    This program is for WingedShooter. It will propably also work for
+//    Wheeled, Tracked and Legged Shooter and OrgaShooter but thats untested.
+
+
+
+extern void object::AlienKiller()
+{
+	
+	object alien, item;
+	float ground ,wantedFlightHight, wantedAltitude, jetPower, angle;
+	point oldPosition;
+	
+	if((energyCell.energyLevel < 0.8) or (shieldLevel < 0.8))        //prepare to hunt aliens
+	{
+		maint();
+	}
+	
+	while(true)
+	{
+		alien = closestEnemy();
+		while(alien != null)        //if there still is any aliens left
+		{
+			while((distance(position, alien.position) > 35) and (energyCell.energyLevel > 0.4) and (shieldLevel > 0.7))        //close in on alien position
+			{
+				headTo(alien, position);        //Close in on alien position
+				alien = closestEnemy();
+				if(alien == null) break;
+			}
+			
+			alien = closestEnemy();
+			if(alien != null)                //if there still is any aliens left
+			{
+				while((distance(position, alien.position) < 35) and (energyCell.energyLevel > 0.3) and (shieldLevel > 0.7))        //if the alien is close enough to kill and evrything else is OK
+				{
+					alien = closestEnemy();
+					if(alien == null) break;            //if there isn't any aliens left
+					turn(direction(alien.position));    //else
+					
+					angle = atan(((topo(alien.position)+alien.altitude)-(topo(position)+altitude))/distance2d(position, alien.position));        //find out where to aim
+					
+					aim(angle);        //prepare for the kill
+					
+					if((angle <= 20) and (angle >= -20))        //if it's possibly to kill the alien
+					{
+						turnAndFire();        //shoot the alien
+						
+						if( topo(position) < 0)        //keep a good altitude
+						    ground = 0;
+						else
+						    ground = topo(position);
+						
+						wantedFlightHight = ground + 3;
+						jetPower = (wantedFlightHight - position.z)/5;
+						motor(0.7, 0.7);        //slow down
+						jet(jetPower);
+						wait ( 0.1 );
+					}
+					
+					if(angle > 20)            //if it's not possible to hit alien with current flight altitude
+					{                         //slow down and find a altitude from whitch to kill that alien
+						motor(0.3, 0.3);
+						jet(1);
+						wait ( 0.1 );
+					}
+					
+					if(angle < -20)
+					{
+						motor(0.3, 0.3);
+						jet(-1);
+						wait ( 0.1 );
+					}
+					
+					if(oldPosition == position)        //if there is something in the way
+					{
+						avoidObstacle();
+					}
+					oldPosition = position;
+				}
+				
+				alien = closestEnemy();
+			}
+			
+			if((energyCell.energyLevel < 0.6) or (shieldLevel < 0.8))        //if it isn't OK to kill another alien
+			{
+				maint();
+			}
+			
+			alien = closestEnemy();
+		}
+		
+		maint();        //recharge before returning to Spaceship
+		
+		item = radar(SpaceShip); // looks for SpaceShip
+		
+		while(distance(position, item.position) > 70)
+		{
+			headTo(item, position);
+		}
+		
+		goto(item.position);   // goes to the SpaceShip
+		
+		message("Waiting on SpaceShip for enemies to kill", DisplayInfo);
+		
+		
+		if(alien == null)               //make room on SpaceShip there could come others from the same direction
+		{
+			turn((rand() * 180) - 90);
+			motor(0.5, 0.5);
+			wait(rand() * 2 + 1);
+			motor(0, 0);
+		}
+		while(alien == null)            //wait 20s for aliens to apear 
+		{
+			wait(20);
+			alien = closestEnemy();
+		}
+		message("Found enemies to kill", DisplayWarning);        //found more aliens to kill
+	}
+	
+}
+
+
+
+void object::maint()        //Maintenance    Thanks to sclover@abac.com for errordetectingcode
+{
+	object item;
+	int errcode;
+	
+	errmode(0);
+	
+	if(energyCell.energyLevel < 0.8)
+	{
+		item = radar(PowerStation);         // looks for power station
+		
+		while(distance(position, item.position) > 70)        //sometimes goto() wasn't good enough
+		{
+			headTo(item, position);
+		}
+		
+		errcode = goto(item.position);        //let goto() take over
+		while(errcode != 0)        //if station is unreachable wait 3s
+		{                          
+			turn(direction(item.position));
+			temperatureGuard();
+			wait(3);
+			errcode = goto(item.position);
+		}
+		
+		while(energyCell.energyLevel < 1)
+		{
+			wait(0.5);            // waits until recharged
+		}
+		turn(90);                //move away from landingpad
+		motor(1, 1);
+		wait(1.5);
+	}
+	
+	
+	if ( shieldLevel < 1 )
+	{
+		item = radar(RepairCenter);        // looks for repair station
+		errcode = goto(item.position);        //goto() is good enough here
+		while(errcode != 0)        //if station is unreachable wait 3s
+		{
+			turn(direction(item.position));
+			temperatureGuard();
+			wait(rand() * 3);
+			errcode = goto(item.position);
+		}
+		
+		while(shieldLevel < 1)
+		{
+			wait(1);            // waits until recharged
+		}
+		
+		turn(90);            //move away from landingpad
+		motor(1, 1);        
+		wait(1.5);
+	}
+}
+
+void object::turnAndFire()            //Kill a alien if it's close enough 
+{                                     //also used to protect the bot when it's volnerable
+	object alien;
+	float angle;
+	
+	alien = closestEnemy();
+	if(alien != null)        //if there still is a alien left
+	{
+		if(distance(position, alien.position) < 35)
+		{
+			turn(direction(alien.position));
+			
+			angle = atan(((topo(alien.position)+alien.altitude)-(topo(position)+altitude))/distance2d(position, alien.position));
+			
+			aim(angle);    //aim at the target
+			
+			fire(0.1);    //kill it
+		}
+	}
+}
+
+
+
+void object::temperatureGuard()        //land if enginetemperature is to high
+{
+	point loc;
+	int counter;
+	
+	if(temperature > 0.75) 
+	{
+		jet(0);
+		
+		while(topo(position) < -0.7)         //find somewhere to land
+		{                                                         
+			counter = 0;
+			while(counter < 36)        //part made by sclover@abac.com
+			{
+				loc.x = (cos(orientation) * 20.0) + position.x;
+				loc.y = (sin(orientation) * 20.0) + position.y;
+				loc.z = position.z + 5.0;
+				
+				if(topo(loc) >= -0.7)
+				{
+					move(20);
+					break;
+				}
+				turn(10);
+				counter++;
+			}
+			
+			if(topo(position) >= -0.7)
+			{
+				break;
+			}
+			motor(1, 1);
+			wait(2);
+		}
+		
+		motor(0, 0);        //stop and land
+		jet( -1 );
+		while(altitude >0);
+		{
+			turnAndFire();
+			wait(0.2);
+		}
+		
+		while(temperature > 0)
+		{
+			turnAndFire();
+			wait(0.2);
+		}
+		
+	}
+}
+
+
+
+void object::avoidObstacle()        // if somethings in the way
+{
+	object alien;
+	
+	motor(-1, -1);
+	jet(0);
+	wait(1);
+	temperatureGuard();
+	turnAndFire();
+	turn(90);
+	motor(1, 1);
+	jet(1);
+	wait(1);
+	temperatureGuard();
+	turnAndFire();
+	alien = closestEnemy();
+	if(alien != null)        //if there still is any aliens left
+	{
+		turn(direction(alien.position));
+	}
+	motor(1, 1);
+	jet(1);
+	wait(1);
+}
+
+
+
+object object::closestEnemy()        //find nearest enemy to kill
+{
+	object nearestAlien, alien;
+	int alienList[], nr;
+	
+	nearestAlien = null;
+	alien = null;
+	nr = 0;
+	
+	alienList[nr++] = AlienWasp;
+	alienList[nr++] = AlienAnt;
+	alienList[nr++] = AlienSpider;
+	alienList[nr++] = AlienWorm;
+	alienList[nr++] = AlienEgg;
+	
+	for(nr = 0 ; nr < 5 ; nr++)
+	{
+		alien = radar(alienList[nr]);
+		
+		if(alien != null)        //if there is a alien of this kind
+		{
+			if(nearestAlien != null)        //if there is a alien of another detected kind 
+			{
+				if((distance(position, nearestAlien.position)) > (distance(position, alien.position)))        //whitch alien is closest 
+				{
+					nearestAlien = alien;
+				}        
+			}
+			else
+			{
+				nearestAlien = alien;        //if it wasn't 
+			}
+		}
+	}
+	
+	if(nearestAlien == null)        //if there is no other alien go for the queen (if there is any)
+	{
+		nearestAlien = radar(AlienQueen);
+	}
+	
+	return nearestAlien;        //return whitch alien is the closest alien to current position    
+}
+
+
+
+void object::headTo(object goal,point oldPosition)        //moves for 0.1s closer to the goal
+{                                                         //uses oldPosition to find out if there 
+	                                                      //is something in the way
+	
+	float ground ,wantedFlightHight, wantedAltitude, jetPower;
+	
+	
+	temperatureGuard();
+	
+	if( topo(position) < 0)
+	    ground = 0;
+	else
+	    ground = topo(position);
+	
+	wantedAltitude = 6;
+	
+	wantedFlightHight = ground + wantedAltitude;
+	jetPower = (wantedFlightHight - position.z)/5;
+	
+	if(jetPower < -0.7)        //lower jetpower could drop the bot to the ground
+	{
+		jetPower = -0.7;
+	}
+	
+	motor(1-(direction(goal.position)/30),1-(-direction(goal.position)/30));        //Made by NaBen
+	jet(jetPower);
+	wait(0.1);
+	
+	if(oldPosition == position)        //if bot hasn't moved
+	{
+		avoidObstacle();
+	}
+}
+

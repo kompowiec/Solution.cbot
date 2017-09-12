@@ -1,0 +1,24 @@
+extern void object::Gotyoback()
+{
+	object item;		//variable for PowerStation
+	point ally;		//position for ally
+	object partner;		//variable for ally
+	
+	partner = radar(TrackedShooter);	//find partner
+	ally = (partner.position);		//set position for ally
+	goto(partner.position);			//go to ally
+	drop(Behind);     	 // and drop full cell behind
+	grab(InFront);     	// take the empty cell in front
+	turn(90);		//turn left
+	drop(InFront);		//set down empty cell
+	turn(-90);		//turn right
+	grab(Behind);		//grab full cell behind
+	drop(InFront);		//place full in ally
+	turn(90);		//turn left
+	grab(InFront);		//grab empty cell
+	item = radar(PowerStation);	//set power station location
+	goto(item.position);		//go to power station
+	wait(5);			//wait for full charge
+	goto(ally);			//return to partner
+}
+

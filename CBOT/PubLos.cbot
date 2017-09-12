@@ -1,0 +1,63 @@
+//By: ENS             ON: Dec/02/2001
+//
+//How to use LOS
+//Returns a Boolean; true if the line of site is clear
+//false if the line of site is obstructed
+//
+//Syntax: LOS(Object Target, float Scan Spacing)
+//
+//Scan Spacing is the distance between test points.
+//The smaller this number is the more accurate your test will be
+//However, you may find that if you use to small of a number
+//or are checking over a very long distance (as in form one
+//side of the map to the other) that the program that called
+//this command may lag during this process.
+//I recommend a scan of 3 to 5, however it is dependant on the 
+//extremes of the map you are playing. On some maps you can
+//easily get away with a scan of 10, on others you need to use
+//one or two.
+//
+//Since this function is listed as public you can access this
+//program from any bot, as long as it is loaded in one bot.
+//The bot that is holding this code may be running another program 
+//or nothing at all.  Keep in mind that if the bot holding this 
+//code is destroyed things could get messy until you load it back 
+//up in a new bot... I've fond shilders running a self defense
+//program are wonderful for holding public code.
+//if you wish to use this code for an internal call simply remove
+//the "public" and copy and paste the code into your program.
+//Enjoy! 
+extern void object::PubLOS(){}//this is just to show something in the program list
+
+public boolean object::LOS(object objTarget, float fltDist)
+{
+	if(objTarget == null) return false;    //if it doesn't exist you can't see it
+	ipf(10000);                            //Zip through the code AFAP
+	point pntCheck;
+	point pntScale;
+	point pntHigh;
+	point pntPosAlt;
+	float fltDistance;
+	
+	pntPosAlt = position;
+	fltDistance = distance(position, objTarget.position);
+	
+	//Calculate the change per unit... "3d slope"
+	pntScale.x = (objTarget.position.x - position.x)/fltDistance;
+	pntScale.y = (objTarget.position.y - position.y)/fltDistance;
+	pntScale.z = (objTarget.position.z - position.z)/fltDistance;
+	
+	//loop until you have reached the location of the target
+	for(int I=fltDist; I < fltDistance; I=I+fltDist)
+	{
+		pntCheck.x = pntPosAlt.x + (pntScale.x * I);
+		pntCheck.y = pntPosAlt.y + (pntScale.y * I);
+		pntCheck.z = pntPosAlt.z + (pntScale.z * I);
+		
+		//see if the "line of site" that is calculated
+		//is above or below the ground
+		if(pntCheck.z < topo(pntCheck)) return false;
+	}
+	return true;
+}
+

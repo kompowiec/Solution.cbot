@@ -1,0 +1,36 @@
+extern void object::FeedtheFactory()
+{
+	point  start;          // variable for initial pos.
+	object item;           // info. about power station
+	
+	start = position;      // stores initial position
+	
+	while(true)        //while Titanium exists
+	{
+		item = radar(Titanium);	// looks for Titanium
+		goto(item.position);		// goes to the Titanium
+		grab(InFront);       		//gets titanium
+		
+		item = radar(BotFactory); 	//looks for bot factory
+		goto(item.position);		//go to bot factory
+		drop(InFront);       		//put titanium in factory
+		message("Titanium delivered");  //ack of delivery
+		
+		item = radar(PowerCell);  	//find power cell
+		goto(item.position);       	//go to power cell
+		grab(InFront);	       	//get power cell
+		
+		item = radar(PowerStation);  	//looks for power station
+		goto(item.position);       	//goes to power station
+		wait(5);            		// waits until recharged
+		
+		item = radar(BotFactory);  	//looks for bot factory
+		goto(item.position);       	//go to bot factory
+		drop(InFront);			//could have it look for the bot type here and load PowerCell
+		message("Power delivered");	//Ack power delivered
+	}
+	
+	goto(start);           		// comes back to initial pos.
+	message("Titanium exhaused");	//ack resource exhausted
+}
+

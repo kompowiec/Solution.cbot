@@ -1,0 +1,43 @@
+extern void object::CollectUranium3()
+{
+	// 1) Variable definition.
+	object  item;            // info. about objects
+	
+	while (true)             // repeat forever
+	{
+		// 2) Go to the titanium ore and grab it.
+		item = radar(UraniumOre);// look for Uranium ore
+		goto(item.position);     // go to the position
+		grab();                  // grab the Uranium
+		
+		// 3) Go to the converter and drop it.
+		item = radar(NuclearPlant); // look for converter
+		goto(item.position);     // go to the position
+		drop();                  // drop the Uranium
+		move(-2.5);              // step back 2.5 m
+		
+		// 4) Wait until titanium converted and grabs
+		wait(35);
+		move(2.5);               //replaced blind wait&grab
+		grab();
+		
+		// 5) Go to free space and drop it
+		goto(space(position));    // go to free space
+		drop();                   // drop titanium
+		
+		// If power cell half empty, recharges.
+		if ( energyCell.energyLevel < 0.5 )
+		{                         // if so:
+			item = radar(PowerStation);
+			if ( item != null )   // station found ?
+			{
+				goto(item.position); // go there
+				while ( energyCell.energyLevel < 1 )
+				{ // until recharged:
+					wait(1);      // wait
+				}
+			}
+		}
+	}
+}
+

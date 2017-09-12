@@ -1,0 +1,149 @@
+// locates a WingedShooter with less than 'full' (0.9)
+// energy and resupplies it with a cell that's at least at
+// 'minevel' (0.8).
+// precond: hands empty or carrying power cell
+extern void object::ReloadWingedShooter()
+{
+	// level at which we decide to reload power cells
+	float minLevel = 0.8;
+	
+	// full is defined in pickNonFullWS, below
+	
+	point home = position;
+	
+	object ws = pickNonFullWS();
+	if (ws == null) {
+		message("Nobody to resupply");
+		return;
+	}
+	if (load==null) grabPowerCell();
+	if (load.category!=PowerCell) {
+		message("I cannot resupply the WS because I am carrrying something already");
+		// (and it's not a power cell)
+		return;
+	}
+	
+	if (load.energyLevel<minLevel) {
+		message("reloading power cell first, it is below "+minLevel);
+		sub_reload();
+	}
+	
+	/// go to winged shooter and replace power cell
+	
+	goto(ws.position);
+	if (ws.load!=null) {
+		// switch old cell for new
+		message("Removing old cell");
+		drop(Behind); // drop our loaded cell
+		grab(); // take old one
+		turn(90);
+		drop(); // drop old one
+		turn(-90);
+		grab(Behind); // take loaded cell
+	}
+	// insert new cell in winged shooter
+	drop();
+	
+	
+	message("Done refueling WS, returning to starting point");
+	goto(home);
+}
+
+// makes sure we grab a power cell. Gets a power cell around
+// us or from the power plant if that's closer.
+// precond: hands empty
+void object::grabPowerCell() {
+	
+	object energy = radar(PowerCell);
+	object factory = radar(PowerPlant);
+	
+	if (factory!=null) {
+		object bat = factory.energyCell;
+		if (null!=bat) {
+			// power plant has a battery ready
+			if (distance(position,bat.position)<distance(position,energy.position)) {
+				// power plant is closer, take its battery
+				// instead
+				energy = bat;
+			}
+		}
+	}
+	
+	if (energy == null) {
+		message("No power cell around");
+		return;
+	}
+	
+	goto(energy.position);
+	grab();
+}
+
+// reload power and shield
+void object::sub_reload()
+{
+	object item;           // info. about power station
+	
+	point start = position;      // store initial position
+	
+	item = radar(PowerStation); // look for station
+	goto(item.position);   // go to the power station
+	
+	object l = load;
+	if (null!=l) {
+		if (l.category != EnergyCell) l = null;
+	}
+	int cl = 0;
+	if (l == null) cl = 1;
+	else cl = l.energyLevel;
+	
+	while ( energyCell.energyLevel < 1 or cl < 1)
+	{
+		wait(1);            // wait until recharged
+		if (l == null) cl = 1;
+		else cl = l.energyLevel;
+	}
+	
+	object rep = radar(RepairCenter);
+	if (shieldLevel<1.0 and null!=rep) {
+		goto(rep.position);
+		while (shieldLevel<1.0) {
+			wait(1);
+		}
+	}
+	message("Recharge completed");
+}
+
+// returns a winged shooter with energy below 'full',
+// or null if none exist
+object object::pickNonFullWS() {
+	
+	// we will not pick a WS with power above this level
+	float full=1;
+	
+	float m =0;
+	int count=0;
+	object ws = null;
+	float l; // energy level of WS in consideration
+	do {
+		count++;
+		ws = radar(WingedShooter,0,360,m);
+		l=0;
+		if (null!=ws){
+			if (null!=ws.energyCell) {
+				l = ws.energyCell.energyLevel;
+			}
+		}
+		
+		if (l>=full and null!=ws) {
+			m=distance(position,ws.position)+0.1;
+			ws = null;
+		} else if (null!=ws) {
+			message("picked a WS with energy ("+l+")");
+		}
+	} while (l>=full and count<100);
+	if (null==ws) {
+		message("There is no WS under "+full+" around");
+	}
+	return ws;
+}
+

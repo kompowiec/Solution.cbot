@@ -1,0 +1,296 @@
+// Air Superiority Fighter
+// Version 1.00
+// by Black Eagle
+// blackeagle@gamebox.net
+// For WingedShooter and WingedOrgaShooter
+// Features :
+// - Effective against all types of enemies (except AlienQueen, of course! :) )
+// - Low energy usage for firing
+// - Recharges and repairs itself when needed
+// - Avoids water while cooling down (if it can)
+//
+// Notes :
+// * Don't use first person camera while using this program
+// because of the pitch bug. It will drop the accuracy
+// severely.
+//
+// * This bot can take the following commands via an
+// information exchange post :
+//   - wsguardrange : change the guard range
+//   - wsfirerate   : change the firing rate
+//   - wsfiredelay  : change the firing delay
+//   - wsguardpoint : change the guard point with the 
+//                    wsguardpointx as the x value and 
+//                    wsguardpointy as the y value
+//                  ( This bot DOESN'T check if the guard
+//                    point is covered with water or not,
+//                    so be careful when using this command )
+
+extern void object::AirSuperiority()
+{
+	object item;
+	int err1;
+	int err2;
+	int temp1;
+	int temp2;
+	int tempdir;
+	int tempdis;
+	float curdir;
+	float nexttopo;
+	float turnmotor;
+	float firerate;
+	float enemydir;
+	float enemylife;
+	float fired;
+	object enemy;
+	object enemy1;
+	point guardpoint;
+	point togo;
+	errmode(0);
+	ipf(800);
+	guardpoint = position;
+	int list[], i;
+	float maxsearch;
+	float maxsearchorig;
+	int firedelay;
+	int firedelaytime;
+	
+	
+	enemylife = 0;
+	
+	fired = 0.15;
+	temp1 = 0;
+	firedelay = 0;
+	firedelaytime = 12;  // Firing delay before another fire
+	firerate = 0.25;     // Firing Rate
+	maxsearch = 300;     // Max. search area.
+	maxsearchorig = maxsearch; 
+	
+	i = 0;
+	list[i++] = AlienAnt;
+	list[i++] = AlienWasp;
+	list[i++] = AlienSpider;
+	list[i++] = AlienEgg;
+	list[i++] = AlienWorm;
+	
+	
+	while(true){
+		
+		if (radar(PowerStation) == null) {
+			message("No Power Station Found. Aborting...",DisplayError);
+			break;
+		}
+		if (energyCell.energyLevel < (0.4+fired) | shieldLevel < 0.4)
+		{                        // if so:
+			item = radar(PowerStation);
+			if ( item != null & distance2d(item.position,position) <= 50) {
+				if ( item != null )   // station found ?
+				{
+					err1 = goto(item.position); // go there
+					if (err1 != 0) {
+						err2 = goto(space(item.position,8,120,4));
+						if (err2 != 0) {
+							while(err2 != 0){
+								wait(1);
+								err2 = goto(space(item.position,8,120,4));
+							}
+						}
+						message("Power Station occupied, waiting...",DisplayInfo);
+						while (err1 != 0) {
+							wait(1);
+							err1 = goto(item.position);
+						}
+					}
+					while ( energyCell.energyLevel < 1 )
+					{ // until recharged:
+						wait(1);      // wait
+						fired = 0.15;
+					}
+				}
+				if (shieldLevel < 1){
+					item = radar(RepairCenter);
+					if ( item != null )   // repairstation found ?
+					{
+						err1 = goto(item.position); // go there
+						if (err1 != 0) {
+							err2 = goto(space(item.position,8,120,4));
+							if (err2 != 0) {
+								while(err2 != 0){
+									wait(1);
+									err2 = goto(space(item.position,8,120,4));
+								}
+							}
+							message("Repair Center occupied, waiting...",DisplayInfo);
+							while (err1 != 0) {
+								wait(1);
+								err1 = goto(item.position);
+							}
+						}
+						while ( shieldLevel < 1 )
+						{ // until recharged:
+							wait(1);      // wait
+						}
+					}
+				}
+			}
+			else {
+				enemy = radar(PowerStation);
+			}
+		}
+		if (energyCell.energyLevel >= (0.4+fired) & shieldLevel >= 0.4) enemy = radar(list,0,360,0,maxsearch,1);
+		
+		if (testinfo("wsguardrange",1000)) {
+			maxsearch = receive("wsguardrange",1000);
+			deleteinfo("wsguardrange",1000);
+		}
+		
+		if (testinfo("wsfirerate",1000)) {
+			firerate = receive("wsfirerate",1000);
+			deleteinfo("wsfirerate",1000);
+		}
+		
+		if (testinfo("wsfiredelay",1000)) {
+			firedelaytime = receive("wsfiredelay",1000);
+			deleteinfo("wsfiredelaytime",1000);
+		}
+		
+		if (testinfo("wsguardpoint",1000)) {
+			guardpoint.x = receive("wsguardpointx",1000);
+			guardpoint.y = receive("wsguardpointy",1000);
+			deleteinfo("wsguardpoint",1000);
+		}
+		
+		if (enemy != null & temperature < 0.75) {
+			togo.x = (2*cos(orientation))+position.x;
+			togo.y = (2*sin(orientation))+position.y;
+			togo.z = position.z;
+			if(position.z - topo(position) < 2 | position.z - topo(togo) < 2 | position.z < 1) jet(1);
+			else {
+				if(position.z - topo(position) > 10) jet(-0.2);
+				if(enemy.category != AlienWasp and enemy.category != PowerStation) {
+					if(atan(((position.z-enemy.position.z)/distance2d(position,enemy.position))) > 20) jet(-0.8);
+					if(atan(((position.z-enemy.position.z)/distance2d(position,enemy.position))) < 15) jet(0.8);
+				}
+				else {
+					if( enemy.category != PowerStation ) {
+						if(position.z < enemy.position.z) jet(0.4);
+						if(position.z > enemy.position.z) jet(-0.4);
+					}
+				}
+			}
+			turnmotor = distance(position,enemy.position)/150;
+			if(turnmotor < 0) turnmotor = 0;
+			if(turnmotor > 1) turnmotor = 0.5;
+			enemydir = direction(enemy.position);
+			while(enemydir < -180 | enemydir > 180) {
+				if(enemydir < -180) enemydir = enemydir + 360;
+				if(enemydir > 180) enemydir = enemydir - 360;
+			}
+			if(enemy.lifeTime > enemylife & enemy.lifeTime < (enemylife + 5)) {
+				
+			}
+			else firedelay = 0;
+			enemylife = enemy.lifeTime;
+			if(firedelay > 0) firedelay = firedelay - 1;
+			if (distance(enemy.position,position) > 45) {
+				if(enemydir > 0) motor(turnmotor,1);
+				if(enemydir < 0) motor(1,turnmotor);
+				if(enemydir == 0) motor(1,1);
+				
+			}
+			else {
+				if(enemydir > -60 & enemydir < 60) {
+					if(enemydir > 0) motor(turnmotor,1);
+					if(enemydir < 0) motor(1,turnmotor);
+					if(enemydir == 0) motor(1,1);
+				}
+				else motor(1,1);
+			}
+			aim((atan((position.z+1.5-enemy.position.z)/(distance2d(enemy.position,position)))*-1)-pitch);
+			if(direction(enemy.position) < 5 & direction(enemy.position) > -5 & distance(enemy.position,position) < 45 & firedelay < 1){
+				fire(firerate);
+				if(fired > 0) fired = fired - 0.02;
+				firedelay = firedelaytime;
+			}
+		}
+		if (enemy != null & temperature > 0.75) {
+			temp1 = 0;
+			enemy1 = radar(list,temp1,45,30,150,1);
+			while(enemy1 != null) {
+				temp1 = temp1 + 45;
+				enemy1 = radar(list,temp1,45,30,150,1);
+			}
+			turn(temp1);
+			togo.x = (4*cos(orientation))+position.x;
+			togo.y = (4*sin(orientation))+position.y;
+			togo.z = position.z;
+			while(temperature > 0) {
+				curdir = orientation;
+				if (topo(position) > 0) {
+					motor(1,1);
+					jet(-0.1);
+					togo.x = (8*cos(curdir))+position.x;
+					togo.y = (8*sin(curdir))+position.y;
+					togo.z = position.z;
+					if (topo(togo) <= 0) {
+						temp1 = 0;
+						while (topo(togo) <= 0) {
+							temp1 = temp1 + 15;
+							enemy1 = radar(list,temp1,10,30,150,1);
+							while(enemy1 != null) {
+								temp1 = temp1 + 15;
+								enemy1 = radar(list,temp1,10,30,150,1);
+							}
+							togo.x = (8*cos(curdir+temp1))+position.x;
+							togo.y = (8*sin(curdir+temp1))+position.y;
+							togo.z = position.z;
+						}
+						togo.x = (8*cos(curdir))+position.x;
+						togo.y = (8*sin(curdir))+position.y;
+						togo.z = position.z;
+						temp2 = 0;
+						while (topo(togo) <= 0) {
+							temp2 = temp2 - 15;
+							enemy1 = radar(list,temp2,10,30,150,1);
+							while(enemy1 != null) {
+								temp2 = temp2 - 15;
+								enemy1 = radar(list,temp2,10,30,150,1);
+							}
+							togo.x = (8*cos(curdir+temp2))+position.x;
+							togo.y = (8*sin(curdir+temp2))+position.y;
+							togo.z = position.z;
+						}
+						if(-temp2 > temp1) tempdir = temp1;
+						if(-temp2 <= temp1) tempdir = temp2;
+						turn(tempdir);
+					}
+				}
+				if (topo(position) <= 0) {
+					motor(1,1);
+					jet(-0.05);
+					if(topo(togo) < 0) {
+						temp1 = 0;
+						tempdis = 10;
+						while(topo(togo) < 0) {
+							temp1 = temp1 + 45;
+							togo.x = (tempdis*cos(curdir+temp1))+position.x;
+							togo.y = (tempdis*sin(curdir+temp1))+position.y;
+							togo.z = position.z;
+							if(temp1 >= 360) {
+								temp1 = 0;
+								tempdis = tempdis + 15;
+							}
+						}
+						turn(temp1);
+					}
+				}
+			}
+		}
+		if (enemy == null & distance(position,guardpoint) > 3) {
+			goto(guardpoint);
+		}
+	}
+	
+	
+}
+

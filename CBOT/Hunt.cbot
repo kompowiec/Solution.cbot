@@ -1,0 +1,74 @@
+extern void object::Hunt()
+{
+	//A bunch of preporation
+
+	object enemy, power, health;
+	float x;
+	power=radar(PowerStation);
+	health=radar(RepairCenter);
+	enemy=radar(AlienAnt);
+
+	//main loop, terminates after all ants are dead
+	
+	while(enemy!=null)
+	{
+		//Rise 10 above the target ant
+
+		enemy=radar(AlienAnt);
+		while(topo(enemy.position)+enemy.altitude+10 > topo(position)+altitude)
+		{
+			jet(1);
+		}
+
+		//approach ant
+		
+		turn(direction(enemy.position));
+		move(distance2d(position, enemy.position)-20);
+		enemy=radar(AlienAnt);
+
+		//decends to ant level
+
+		while(atan((enemy.altitude-altitude)/distance2d(position, enemy.position))<0)
+		{
+			jet(-0.5);
+			enemy=radar(AlienAnt);
+		}
+
+
+		//fire at ant
+		
+		while(distance2d(enemy.position, position)<25)
+		{
+			enemy=radar(AlienAnt);
+			turn(direction(enemy.position));
+			aim(atan(((topo(enemy.position)+enemy.altitude)-(topo(position)+altitude))/distance2d(position, enemy.position)));
+			fire(0.1);
+		}
+		
+		
+		//shield and power mantinance
+
+		if (shieldLevel<0.6)
+		{
+			goto(health.position);
+			while ( shieldLevel < 1 )
+			{
+				wait(1);           // waits until recharged
+			}
+		}
+		
+		if (energyCell.energyLevel<0.3)
+		{
+			
+			
+			goto(power.position);
+			while ( energyCell.energyLevel < 1 )
+			{
+				wait(1);           // waits until recharged
+			}
+		}
+		enemy=radar(AlienAnt);
+	}
+}
+// by NeBan
+

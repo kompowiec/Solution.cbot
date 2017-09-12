@@ -1,0 +1,31 @@
+extern void object::ServiceTower1()
+{
+	object  tower;               // informacje o wieży
+	object  station;             // informacje o stacji
+	
+	// 1) idź do wieży obronnej
+	tower = radar(DefenseTower); // znajdź wieżę
+	goto(tower.position);        // i idź tam
+	
+	while ( true )               // powtarzaj w nieskończoność
+	{
+		// 2) poczekaj na wyczerpanie ogniwa elektrycznego
+		while ( tower.energyCell.energyLevel > 0.2 )
+		{
+			wait(2);
+		}
+		grab();                  // weź ogniwo elektryczne
+		
+		// 3) idź do elektrowni i naładuj je
+		station = radar(PowerStation);
+		goto(station.position);  // idź tam
+		while ( load.energyLevel < 1 )
+		{
+			wait(1);             // poczekaj aż się naładuje
+		}
+		
+		// 4) wróć do wieży obronnej
+		goto(tower.position);    // idź do wieży
+		drop();                  // zostaw ogniwo elektryczne
+	}
+}

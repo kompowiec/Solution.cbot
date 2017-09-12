@@ -1,0 +1,97 @@
+extern void object::Attack2()
+{
+	ipf(800);
+	
+	int cat[];                
+	cat[0] = AlienAnt;    
+	cat[1] = AlienWorm;  
+	cat[2] = AlienWasp; 
+	cat[3] = AlienSpider;
+	cat[4] = AlienEgg;
+	
+	object target;
+	
+	float dir;
+	float dis;
+	float dif;
+	float ang;
+	
+	boolean hot = false;
+	
+	while((target = radar(cat)) != null)
+	{
+		if(temperature > 0.8)
+		    hot = true;
+		if(temperature < 0.2)
+		    hot = false;
+		
+		if(hot and topo(position) > 1)
+		    jet(-1);
+		else
+		{
+			dis = distance2d(position,target.position);  
+			dif = target.position.z-position.z;
+			ang = atan(dif/(dis-5)); 
+			
+			jet(1-ang/-15);   
+		}
+		
+		dis = distance2d(position,target.position); 
+		dif = target.position.z-position.z;
+		ang = atan(dif/dis); 
+		
+		if(altitude == 0)
+		    ang -= pitch;
+		
+		dir = direction(target.position);
+		
+		if(dis < 40 and abs(ang) < 20 and abs(dir) < 112.5)
+		    turn(dir);
+		else
+		    motor(1-dir/45,1+dir/45);
+		
+		dis = distance2d(position,target.position);  
+		dif = target.position.z-position.z;
+		ang = atan(dif/dis)-pitch; 
+		
+		aim(ang);
+		
+		dir = direction(target.position);
+		
+		if(dis < 40  and abs(ang) < 20 and abs(dir) < 5)
+		    fire(0.1); 
+		
+		if(dis > 40)
+		    maint();  
+	}
+}
+
+void object::maint()
+{
+	if(energyCell.energyLevel < 0.35)
+	{
+		object pwr = radar(PowerStation);
+		
+		if(pwr != null)
+		{
+			goto(pwr.position,5);
+			
+			while(energyCell.energyLevel < 1)
+			    wait(1);
+		}
+	}
+	
+	if(shieldLevel < 0.45)
+	{
+		object rep = radar(RepairCenter);
+		
+		if(rep != null)
+		{
+			goto(rep.position,5);
+			
+			while(shieldLevel < 1)
+			    wait(1);
+		}
+	}
+}
+

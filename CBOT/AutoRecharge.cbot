@@ -1,0 +1,67 @@
+extern void object::AutoRecharge()
+{
+	object chose;
+	point self;
+	float r = 0;
+	float minenergy = 0.25;
+	float minrecharge = 0.60;
+	
+	if (energyCell.energyLevel < minenergy) {
+		self.x = position.x;
+		self.y = position.y;
+		self.z = position.z;
+		
+		if (energyCell.energyLevel == 0) {
+			message ("Energy too low - can't do anything");
+			return;
+		}
+		//  message ("Energy low : seeking for energy...");
+		
+		chose = radar (PowerStation);
+		if (chose == null) {
+			
+			while (true) {
+				//    if (r == 1000) {
+				//     message ("Can't find PowerCells :(");
+				//     return;
+				//    }
+				chose = radar (PowerCell, 0, 360, r);
+				if (chose == null)
+				{
+					message ("Can't find PowerCells :(");
+					return;
+				} else {
+					if (chose.energyLevel > minrecharge) { // min req
+						goto(chose.position);
+						grab();
+						drop();
+						grab (EnergyCell);
+						drop(Behind);
+						grab();
+						drop(EnergyCell);  
+						message ("PowerCell found, coming back...");
+						break;
+					}
+				}
+				r += 1;
+			}
+			
+		}
+		else
+		{
+			goto (chose.position);
+			while (energyCell.energyLevel < 1)
+			{
+				wait (0.5);
+			}
+			message ("Fully recharged, coming back...");
+		}
+		goto (self) ;
+		message ("Back and available");
+	}
+	else
+	{
+		message ("Programmed to recharge only if energy < " + minenergy);
+	}
+}
+

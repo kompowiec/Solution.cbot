@@ -1,0 +1,17 @@
+extern void object::CollectTitanium1()
+{
+	// 1) Definicja zmiennej
+	object  item;            // informacja o obiekcie
+	
+	// 2) Idź do rudy tytanu i podnieś ją
+	item = radar(TitaniumOre);// znajdź rudę tytanu
+	goto(item.position);     // idź do pozycji
+	grab();                  // podnieś porcję rudy
+	
+	// 3) Idź do huty i zostaw rudę
+	item = radar(Converter); // znajdź hutę
+	goto(item.position);     // idź do pozycji
+	drop();                  // zostaw rudę
+	move(-2.5);              // cofnij się o 2,5 m
+}
+

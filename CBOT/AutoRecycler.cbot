@@ -1,0 +1,29 @@
+extern void object::AutoRecycler()
+{
+	
+	point  start;         	 // variable for initial pos.
+	object item;          	 // info. about power station
+	
+	start = position;      	// stores initial position
+	while(true)		// while wrecks exsist
+	{
+		item = radar(Wreck); 			// looks for wrecks
+		goto(item.position);   		// goes to the wreck
+		recycle();          			//recycles wreck
+		if (energyCell.energyLevel < 0.5)	//check power remaining >50%
+		{
+			item = radar(PowerStation); 	// looks for station
+			goto(item.position);		// goes to the power station
+			while ( energyCell.energyLevel < 1 )	//if PowerCell less than 100%
+			{
+				wait(1);            // waits until recharged
+			}
+			
+		}
+	}
+	
+	goto(start);           // comes back to initial pos.
+	message("All wrecks recycled");	//Ack all wrecks cleared
+	//Nexus
+}
+

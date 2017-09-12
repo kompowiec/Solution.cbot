@@ -1,0 +1,42 @@
+//radar 1.03
+
+public object object::newradar(int category, float angle, float focus, float min, float max,float way)
+{
+	ipf(1800);
+	object currect=retobject(0);
+	object itemx=null;
+	int i=0;
+	int needdistance;
+	if (way == -1)
+	{
+		needdistance = min - 0.01;
+	}
+	else needdistance = max + 0.01;
+	
+	do
+	{
+		i++;
+		if(currect.category == category)
+		{
+			float dis = direction(currect.position) - angle;
+			if (dis < 0)
+			{
+				dis = -dis; 
+			}
+			if (dis > 180)
+			{
+				dis = 360 - dis;
+			}
+			if((distance(this.position,currect.position) >= min) && (distance(this.position,currect.position) <= max) && ( (distance(this.position,currect.position) * way) < (needdistance * way))  && (dis <= focus /2) )
+			{
+				
+				itemx=currect;
+				needdistance = distance(this.position,currect.position);
+				
+			}
+		}
+		currect=retobject(i);
+		
+	}
+}
+

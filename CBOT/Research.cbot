@@ -1,0 +1,18 @@
+extern void object::Research()
+{
+	
+	object power;
+	object research;
+	power=radar(PowerCell);
+	research=radar(ResearchCenter);
+	goto(power.position);
+	if(power.energyLevel!=1){
+		turn(-90);
+		move(10);
+	}
+	grab();
+	goto(research.position);
+	drop();
+	
+}
+

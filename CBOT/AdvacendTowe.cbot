@@ -1,0 +1,186 @@
+extern void object::AdvancedTowe()
+{
+	errmode(0);
+	object  tower;               // info. about tower
+	object  station;             // info. about station
+	object  obj, item,cell; 
+	point   dest,scrap, storage;
+	int j=5, err,i;
+	float dist, pl, xt,yt,x,y;
+	while(true) {
+		do
+		{
+			tower = radar(DefenseTower,0,360,j-5,j);
+			j+=5;
+			if (tower != null){
+				if (tower.energyCell.energyLevel >= 0.4) {
+					tower = radar(WayPoint,0,1,0,1);
+				}
+			}
+			if (j >= 400){
+				j=5;
+				wait(30);
+			}
+		}
+		while ( tower == null);
+		message("Tower Needs power at X=" + tower.position.x +" Y="+tower.position.y,DisplayInfo);
+		item=radar(PowerStation);
+		if(item==null) { item = radar(SpaceShip);}
+		dist=distance(tower.position,item.position) + distance(position,tower.position);
+		if(category == LeggedGrabber) { pl = (0.05 + 1.1*(dist*0.0008)); }
+		if(category == WheeledGrabber) { pl = (0.10 + 1.5*(dist*0.0016)); }
+		if(category == TrackedGrabber) { pl = (0.10 + 1.5*(dist*0.0025)); }
+		if(energyCell.category == NuclearCell) { pl = pl * 0.1;}
+		message("Estimated Safe power needed is :"+(pl*100)+"% of cell." ,DisplayInfo);
+		message("Current Cell level is:"+ (energyCell.energyLevel * 100) +"%" ,DisplayInfo);
+		if(energyCell.energyLevel < pl and energyCell.category != NuclearCell and (radar(PowerStation)) != null) {
+			j=5;
+			do
+			{
+				item = radar(PowerStation,0,360,j-5,j);
+				j+=5;
+				if (item != null) { err = goto(item.position);
+					if(err != 0){item = radar(WayPoint,0,1,0,1);}
+				}
+				if (j >= 600){
+					j=5;
+					message("PowerStation(s) are blocked!",DisplayWarning);
+					wait(30);
+				}
+				
+			}
+			while (item == null);
+			if (item != null){
+				message("The Bot is recharging its power cells.",DisplayInfo);
+				while ( energyCell.energyLevel < 1 )
+				{
+					wait(1);           
+				}
+				
+			}
+		}
+		else {
+			if (category != Subber) {
+				if(energyCell.energyLevel < pl ) {
+					message("The Bot is changing power cells.",DisplayInfo);
+					j= 5;
+					do{
+						item = radar(PowerCell,0,360,j-5,j);
+						if (item == null) {item = radar(NuclearCell,0,360,j-5,j);}
+						j+=5;
+						if (item != null) {if (item.energyLevel <= 0.8) {
+								item = radar(WayPoint,0,1,0,1);}
+						}
+						if (j >= 400){
+							j=5;
+							message("Bot Cannot find any energy cells.",DisplayInfo);
+							wait(30);
+							
+						}
+					}
+					while ( item == null );
+					
+					do{
+						err = goto(item.position);
+						if (err != 0) { 
+							message("powercell get error.. trying again.",DisplayInfo);
+							turn(120);
+							move(15);
+						}
+					}
+					while(err !=0 );
+					grab(InFront);     // take the new cell in front
+					drop(Behind);      // and drop it behind
+					
+					grab(EnergyCell);  // take the cell from the bot
+					drop(InFront);     // and drop it in front
+					
+					grab(Behind);      // take the new cell
+					drop(EnergyCell);  // and drop it on the bot
+					
+				}
+				else{ if(energyCell.energyLevel < pl ) {
+					item = radar(SpaceShip);
+					goto(item.position);
+					message("Subber needs a Cell change at SpaceShip.",DisplayError);}
+				}
+			}
+		}
+		drop(InFront);
+		j=5;
+		do{
+			item = radar(PowerCell,0,360,j-5,j);
+			if (item == null) { item = radar(NuclearCell,0,360,j-5,j);}
+			j+=5;
+			if (item != null) {if (item.energyLevel <= 0.8) {
+					item = radar(WayPoint,0,1,0,1);}
+			}
+			if (j >= 400){
+				j=5;
+				message("Bot Cannot find any energy cells.",DisplayInfo);
+				wait(30);
+				
+			}
+		}
+		while ( item == null );
+		
+		goto(item.position);
+		grab();
+		goto(tower.position);  
+		turn(90);
+		drop();
+		turn(-90);
+		grab();
+		turn(-90);
+		drop();
+		turn(180);
+		grab();
+		turn(-90);
+		drop();
+		turn(-90);
+		cell = radar(PowerCell,0,360,0,5);
+		grab();
+		turn(-90);
+		if(cell != null and radar(PowerStation) != null ){
+			message("The old cell is rechargable and there is a PowerStation.", DisplayInfo);
+			j=5;
+			do
+			{
+				item = radar(PowerStation,0,360,j-5,j);
+				j+=5;
+				if (item != null) { err = goto(item.position);
+					if(err != 0){item = radar(WayPoint,0,1,0,1);}
+				}
+				if (j >= 600){
+					j=5;
+					wait(30);
+				}
+				
+			}
+			while (item == null);
+			if (item != null){
+				message("The Bot is recharging the old power cell.",DisplayInfo);
+				do {
+					motor(-1,-0.3);
+					wait(2);
+					err=goto(item.position);
+					
+				}
+				while (err != 0);
+				while ( cell.energyLevel < 1 )
+				{
+					wait(1);           
+				}
+				goto(space());
+				drop();
+				
+			}
+			
+		}
+		else{
+			goto(space());
+			drop();
+		}
+	}
+}
+

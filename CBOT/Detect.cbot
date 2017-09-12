@@ -1,0 +1,36 @@
+// Little program that will detect any type of object.
+// Reports distance and compass bearing relative to own position.
+// Closest (most important) objects last.
+
+extern void object::Detect()
+{
+  object item;
+  int bearing, dist;  // Integers for more esthetic report
+  float maxdist;
+  int cat = AlienWorm;  // Fill in what you seek here
+
+  maxdist = 1000;  // Begin scan at 1000 meters
+  while (true)
+  {
+    item = radar(cat, 0, 360 , 0, maxdist, -1);  // Detect furthest first
+
+    if (item == null)  // No more items: exit loop
+      break;
+
+    else  // Item found
+    {
+      dist = distance2d(position, item.position);  // Distance
+
+      // Compass Bearing (0 = north, 90 = east, ...)
+      bearing = 90 - (direction(item.position) + orientation);
+      if (bearing < 0) bearing += 360;
+
+      // Report findings
+      message(item.category + ", bearing: " + bearing + ", distance: " + dist);
+
+      // Next scan must not pick up current item
+      maxdist = dist - 0.1;
+    }
+  }
+}
+

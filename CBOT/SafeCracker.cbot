@@ -1,0 +1,31 @@
+programme: extern void object::SafeCracker()
+{
+object objVault;
+objVault=radar(Vault);
+point pntKeyA;
+point pntKeyB;
+point pntKeyC;
+point pntKeyD;
+float fltAng;
+float fltOri;
+fltOri = objVault.orientation;
+
+fltAng = fltOri-180;
+pntKeyA.x = objVault.position.x + (4*cos(fltAng));
+pntKeyA.y= objVault.position.y + (4*sin(fltAng));
+fltAng = fltOri;
+pntKeyB.x = objVault.position.x + (4*cos(fltAng));
+pntKeyB.y= objVault.position.y + (4*sin(fltAng));
+fltAng = fltOri-90;
+pntKeyC.x = objVault.position.x + (4*cos(fltAng));
+pntKeyC.y= objVault.position.y + (4*sin(fltAng));
+fltAng = fltOri+90;
+pntKeyD.x = objVault.position.x + (4*cos(fltAng));
+pntKeyD.y= objVault.position.y + (4*sin(fltAng));
+
+produce(pntKeyA, 0, KeyA, "");
+produce(pntKeyB, 0, KeyB, "");
+produce(pntKeyC, 0, KeyC, "");
+produce(pntKeyD, 0, KeyD, "");
+}
+

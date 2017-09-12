@@ -1,0 +1,84 @@
+extern void object::advChargeTowers()
+{
+	object tower, battery;
+	object power;
+	int a;
+	float dist;
+	errmode(0);
+	if (load!=null) {
+		drop();
+		
+	}
+	dist=0;
+	while (true) {
+		if (energyCell.energyLevel<0.3) {
+			power=radar(PowerStation);
+			a=goto(power.position);
+			if (a!=0) {
+				message("please free way to the Power Station!");
+				return;
+			}
+			while (energyCell.energyLevel!=1) {
+				wait(1);
+			}
+		}
+		
+		tower=radar(DefenseTower,0,360,dist);
+		if (tower==null) {
+			dist=0;
+			tower=radar(DefenseTower,0,360,dist);
+		}
+		
+		if (tower.energyCell.energyLevel<0.3) {
+			battery=radar(PowerCell,0,360);
+			if (battery==null) {
+				message("No batteries :-(",DisplayWarning);
+				break;
+			}
+			goto(battery.position);
+			grab();
+			if (load.energyLevel!=1) {
+				power=radar(PowerStation);
+				a=goto(power.position);
+				if (a!=0) {
+					message("please free way to the Power Station!");
+					return;
+				}
+				while (load.energyLevel!=1) {
+					wait(1);
+				}
+			}
+			goto(tower.position);
+			drop(Behind);
+			grab();
+			turn(90);
+			drop();
+			turn(-90);
+			grab(Behind);
+			drop();
+			//SwitchCell1();
+			//break;
+			turn(90);
+			grab();
+			power=radar(PowerStation);
+			a=goto(power.position);
+			if (a!=0) {
+				message("please free way to the Power Station!");
+				return;
+			}
+			while (load.energyLevel!=1) {
+				wait(1);
+			}
+			goto(space(position,5,25));
+			drop();
+			
+			
+		} else {
+			dist=distance(tower.position,position)+1;
+			
+		}
+	}
+	
+	
+}
+

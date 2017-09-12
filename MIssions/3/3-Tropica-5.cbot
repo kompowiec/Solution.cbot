@@ -1,0 +1,66 @@
+extern void object::Tropica5()
+{//various
+	object item; //information about object
+	int i;
+	
+	
+	if(category ==WheeledGrabber) //1) Instructions for Wheeled Grabber.
+	{
+		for(int i = 0; i < 2; i++) //go to 2 TitaniumOre
+		{
+			item = radar(TitaniumOre);
+			goto(item.position);
+			grab();
+			
+			item = radar(Converter);
+			if(item == null) message("Waiting for Conveter to be bulid.");
+			while(item == null) item = radar(Converter);
+			i = goto(item.position);
+			while(i != 0) i = goto(item.position);
+			drop();
+			move(-2.5);
+			wait(1);             
+			while(item == null) item = radar(Titanium);
+			goto(item.position);
+			grab();              
+			
+			goto(space(position)); 
+			drop();               
+		}
+		item = radar(Titanium);
+		goto(item.position);
+		grab();
+		
+		if(item == null) message("Waiting for BotFactory to be build.");
+		while(item == null) item = radar(BotFactory);
+		i = goto(item.position);
+		while(i != 0) i = goto(item.position);
+		drop();
+		message("Titanium loaded into BotFactory");
+		
+		item = radar(PowerCell);
+		goto(item.position);
+		grab();
+
+		if(item == null) message("Waiting for Subber to be bulid.");
+		while(item == null) item = radar(Subber);
+		goto(item.position);
+		drop();
+		
+		item = radar(SpaceShip);
+		goto(item.position);
+	}
+	else //Instructions for Subber
+	{
+		move(-5);
+		
+		item = radar(BlackBox);
+		goto(item.position);
+		grab();
+		
+		item = radar(SpaceShip);
+		goto(item.position);
+		drop();
+	}
+	message(category + ": Mission Complete.");
+}

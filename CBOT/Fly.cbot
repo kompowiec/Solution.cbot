@@ -1,0 +1,21 @@
+extern void object::Fly()
+{
+	object target;
+	point  t,ship;
+	target=radar(SpaceShip);ship=target.position;
+	do
+	{
+		target=radar(Target2,0,360,8.25);
+		if(target==null)target=radar(SpaceShip);
+		{
+			t=target.position;
+			jet((t.z-position.z)/20);
+			motor(1-(direction(t)/90),1+(direction(t)/90));
+			if(t==ship&&distance(position,t)<8) 
+			{
+				jet(0);motor(0,0);break;
+			}
+		}
+	}while(target!=null);
+}
+

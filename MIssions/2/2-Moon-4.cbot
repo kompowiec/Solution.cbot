@@ -1,0 +1,75 @@
+extern void object::MoonBlackBox()
+{
+	object item;
+	int i = 0;
+	float range = 0;
+	int errcode = 0;
+	
+	errmode(0);
+	
+	if(category == WheeledGrabber)
+{
+//1) Bulid a converter with the only titanium cube avaliable
+	item = radar(TitaniumOre);
+	goto(item.position);
+	grab(); 
+//2)Deposit one chunk of titanium ore at a time at the center of the platform and let the converter do the rest.
+	item = radar(Converter);
+	if(item == null) message("Waiting to building Converter");
+	while(item == null) item = radar(Converter);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	drop();
+	move(-2.5);
+//3) Bulid a power station with one of the newly converted titanium cubes
+
+//5)Place the grabbers at the center of the power station platform to recharge them. The cells should still have a little power left in them, just enough to radio-control the bots onto the platform.
+	item = radar(PowerStation);
+	goto(item.position);
+	while(errcode != 0)
+		while ( energyCell.energyLevel < 1 )
+		{
+			wait(1); 
+		}
+
+//4)Zbuduj radar a czarna skrzynka pojawi się na mapce
+
+	item = radar(TitaniumOre);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	grab(); 
+
+	item = radar(Converter);
+	while(item == null) item = radar(Converter);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	drop();
+	move(-2.5);
+
+	item = radar(SpaceShip);
+	goto(item.position);
+
+//TO THIS MOMENT HERE APP WOKRS FINE
+}
+else
+{
+	while(item == null) item = radar(PowerStation); 
+	goto(item.position);
+	while ( energyCell.energyLevel < 1 )
+	{
+		wait(1); 
+	}
+//6)Radio-control the winged grabber to the black box and back.
+//7) Gather both grabbers and the black box onto the spaceship platform and climb on board yourself.
+		item = radar(BlackBox);
+		goto(item.position);
+		grab();
+
+//8)Take off.
+		item = radar(SpaceShip);
+		goto(item.position);
+		drop();
+}
+	message(category + ": Mission Complete.");
+}
+

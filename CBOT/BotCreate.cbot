@@ -1,0 +1,43 @@
+extern void object::BotCreate()
+{
+	
+	object metal;
+	object factory;
+	object power;
+	object recharge;
+	metal=radar(Titanium);
+	factory=radar(BotFactory);
+	power=radar(PowerCell);
+	recharge=radar(PowerStation);
+	goto(metal.position);
+	grab();
+	goto(factory.position);
+	move(1);
+	drop(InFront);
+	move(-3);
+	wait(25);
+	goto(power.position);
+	grab();
+	if(power.energyLevel!=1){
+		if(PowerStation==1){
+			goto(recharge.position);
+			while(power.energyLevel!=1){
+				wait(0.1);
+			}
+		}
+		else{
+			turn(-90);
+			move(15);
+			drop();
+			turn(180);
+			move(15);
+		}
+	}
+	goto(factory.position);
+	drop();
+	move(-2);
+	turn(90);
+	move(10);
+	
+}
+

@@ -1,0 +1,315 @@
+===============================================================================
+
+Previously:
+
+...On my latest mission to a previously explored planet I ran across a race of
+abandoned robots, in return of being left alone they gave me information about
+undocumented instructions and mechanism of the bots.
+
+Update:
+
+...Following in the footsteps of this brave explorer, I found this mysterious
+planet. After much negotiation the robots agreed to divulge some more
+information for a large shipment of axle grease.
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
+For those of you well versed in C/C++, Java, Perl, or other languages with
+similar operators you can probably stop reading now. This is intended as an
+intermediate primer for people who'd like an overview of the valid operators
+and associated syntax in Colobot. For each set of operators we'll look at an
+example of them first, then briefly look at what it is they're doing.
+
+Colobot's internal scripting language is very similar to Java/C++ as they
+state, though a very limited and basic subset of it. If the below is too full
+of jargon for your tastes or conversely doesn't give enough details, a good
+programming book or language refference will.
+
+Now enough with the caveats, on to the operators.
+
+-------------------------------------------------------------------------------
+
+OPERATOR TABLE:
+
+The following is an almost complete list of the associativiy and precedence of
+the operators in Colobot. If you're unfamiliar with the previous terms it
+should become clear as we deal with each in detail.
+    
+    na         ++ --
+    right      **
+    right      ! ~
+    left       * / %
+    left       + -
+    left       << >>
+    na         > < >= <=
+    na         == !=
+    left       &
+    left       | ^
+    left       &&
+    left       ||
+    right      ? :
+    right      = += -= *= /= etc.
+    right      not
+    left       and
+    left       or (xor isn't present)
+
+
+Legend:
+------------------------
+left  == left binding
+right == right binding
+na    == non associative
+
+
+-------------------------------------------------------------------------------
+
+PRE AND POST INCREMENT AND DECREMENT
+
+int x = 1;       // initialise x to 1
+message(++x);    // prints 2
+message(x++);    // prints 2
+message(x);      // prints 3
+message(--x);    // prints 2
+
+A '--' or '++' before our variable is a 'pre' operation. As you can see it
+decreases or increases x by one _before_ we evaluate it. So when we
+'message(++x)' we're adding 1 to x before we print it. With the post-increment
+'x++' the addition happens after we've already printed x.
+
+-------------------------------------------------------------------------------
+
+EXPONENTIAL
+
+int x = 2, y = 3;
+x = x ** y;        // x is now 8
+
+This is just like Colobot's pow(x, y) it raises x to the exponent y.
+
+This is our first operator with an associativity. If you look on the chart
+you'll notice that it's a right binding operator. What does this mean? Well
+notice we raised x to the power of y and not the other way around; that's
+because the '**' operator binds to the right term, in this case x, before the
+left term.
+
+-------------------------------------------------------------------------------
+
+UNARY OPERATORS
+
+boolean a,b;
+a = true;
+if (a) { message(1) };      // a is true so prints 1
+a = !a;                     // set a to 'not' a
+if (a) { message(2) };      // a is now 'not' true (false) so doesn't print
+
+The '!' operators performs a logical negation, it's the high precedence version
+of 'not'. So true becomes false and false becomes true.
+
+int x;
+x = 7 &~ 2;   
+message(x);   // prints 5
+x = 7 &~ 3;
+message(x);   // prints 4
+
+Unfortunately I won't be covering bitwise functions indepth, if you're not
+familiar with binary math you might want to check out Dr. Math
+( http://forum.swarthmore.edu/dr.math/ ) specically
+http://www.swarthmore.edu/NatSci/echeeve1/Ref/BinaryMath/BinaryMath.html .
+Dr. Math has been around for quite a few years and is an excellent resource
+for all fields and levels of math.
+
+-------------------------------------------------------------------------------
+
+MULTIPLICATIVE
+
+'*' multiplies.
+
+'/' divides.
+
+'%' determines the modulus of two numbers (integer type only). If you're not
+familiar with modulus math you can think of this as being the remainder after
+a division. 5 divided by 2 is 2 remainder 1, so '%' would return the 1. When
+working with negatives some people are suprised by the result returned, play
+around if you're curious.
+
+message(5*2);  // prints 10
+message(4/2);  // prints 2.00 (autotyped to float)
+message(5%2);  // prints 1 (autotyped to int)
+
+-------------------------------------------------------------------------------
+
+ADDITIVE
+
+'+' adds two numbers.
+
+'-' subtracts two numbers.
+
+Standard math operations.
+
+-------------------------------------------------------------------------------
+
+BITSHIFT
+
+int x = 8, y = 2
+
+message(x << y);  // prints 32
+message(x >> y);  // prints 2
+
+
+Binary shift '<<' shifts the left argument left by the number of bit specified
+by the right argument (both must be integers), '>>' does the same but shifts
+right. See 'Unary Operators' for where to go for help with binary math.
+
+-------------------------------------------------------------------------------
+
+RELATIONAL
+
+'>' if left argument is greater than right argument, returns true.
+
+'<' if left argument is less than right argument, returns true.
+
+'>=' if left argument is greater than or equal to right argument, returns true.
+
+'<=' if left argument is less than pr equal to right argument, returns true.
+
+-------------------------------------------------------------------------------
+
+EQUALITY
+
+'==' if left argument equals right argument, returns true.
+
+'!=' if left argument is not equal to right argument, returns true.
+
+-------------------------------------------------------------------------------
+
+BITWISE 'AND' AND 'OR'
+
+'&' returns the two numbers 'AND'ed bit by bit.
+
+'|' returns the two numbers 'OR'ed bit by bit.
+
+See 'Unary Operators' for where to go for help with binary math.
+
+-------------------------------------------------------------------------------
+
+LOGICAL 'AND' AND 'OR' (Short-circuiting)
+
+'&&' is the higher precedence version of 'and'. In addition it performs
+short-circuit evaluation; that is if the left operand is false the right
+doesn't get evaluated. 
+
+'||' is the higher precedence version of 'or'. In addition it performs
+short-circuit evaluation; that is if the left operand is false the right
+doesn't get evaluated. 
+
+To illustrate short circuiting:
+
+int x, y;
+x = 5;
+
+if (x == 4 && y == 2) { 1; }
+message("Here!");
+
+This will print "Here". Now replace the '&&' with 'and' and run it again.
+You now get a 'Unitialised variable error'. Why is this? Look at the 'if'
+statement, now x as we know is not equal to 4 so the 'if' statement is false
+no matter what the other arguments are in the statement. With the '&&'
+operator soon as it finds a false it 'short-circuits' (or in other words
+stops comparing arguments) on the other hand 'and' compares all the arguments.
+Well y doesn't have a value, so when we compare it an error occurs.
+
+-------------------------------------------------------------------------------
+
+TERNARY/CONDITIONAL
+
+boolean n = true;
+int x;
+
+x = (n) ? 45 : -90;
+turn(x);
+
+The ternary operator can be treated as a special case short form verision of
+the if-then-else statement.
+
+variable = ( condition ) ? true : false;
+
+The best usage for this operator is when you want to assign one or another
+value to a variable based on whether a condition is true or not. You can
+also use it like this:
+
+(radar(Me) != null) ? move(20) : turn(20);
+
+While the preceeding statement is valid, it's considered bad form and isn't
+very legible. In this case using an if-then-else statement is preffered
+(it's also much easier to add additional commands if needed).
+
+-------------------------------------------------------------------------------
+
+ASSIGNMENT
+
+'=' is the standard assignment operator.
+
+Almost all the other operations can be combined into a short form when doing
+the following:
+
+a = a + 2;
+a += 2;
+
+The above are the exact same. Others that work the same way:
+
+**=
+*=
+/=
+%=
++=
+-=
+<<=
+>>=
+-=
+|=
+^=  (Note: I've encoutered a few crashes when using this operator)
+
+-------------------------------------------------------------------------------
+
+LOGICAL 'NOT', 'AND', AND 'OR'
+
+'not' is the same as '!' except with a lower precedence
+
+'and' logical conjunction of two arguments. Low precendece, no short-circuiting.
+
+'and' logical disjunction of two arguments. Low precendece, no short-circuiting.
+
+------------------------------------------------------------------------------
+
+
+
+
+===============================================================================
+
+DECIMAL, HEXADECIMAL, AND OCTAL NOTATION
+
+int x;
+x = 255;   // Decimal notation (default)
+x = 0377;  // NOT OCTAL!!!
+x = 0xFF;  // Hexadecimal notation
+
+While the above three should all equal 255 octal notation is strangely missing
+from Colobot (or non-standard). Hexadecimal on the other hand works fine.
+
+------------------------------------------------------------------------------
+
+
+
+
+===============================================================================
+CREDITS:
+
+Late into the process of writing this I hit myself for doing work that's
+probably been done many many times by people more eloquent than I. So I
+'borrowed' some of the info from these sources, unfortunately for my tired
+fingers I didn't cut and paste but they bear mentioning. Feel free to update
+any errors, typos, etc.
+
+K&R C Bible
+perlman:perlop manpage
+

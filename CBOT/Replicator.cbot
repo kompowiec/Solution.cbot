@@ -1,0 +1,101 @@
+extern void object::Replicator()
+{
+	errmode(0);
+	object chose;
+	object chose1;
+	aim(1);
+	
+	errmode(0);
+	while (true)
+	{
+		//***************RepairCenter***********
+		if ( shieldLevel < 0.25 )
+		{
+			chose1 = radar(RepairCenter);
+			goto(chose1.position);
+			wait(5);
+		}
+		//******RepairCenter>>>PowerStation*****
+		if ( energyCell.energyLevel < 0.25 )
+		{
+			chose = radar(PowerStation);
+			goto(chose.position);
+			wait(5);
+		}
+		//*********PowerStation>>>Attack********
+		int list[], i;
+		object target;
+		errmode(0);
+		while ( ismovie() != 0 )  wait(1);
+		
+		i = 0;
+		list[i++] = SpaceShip;
+		list[i++] = ResearchCenter;
+		list[i++] = BotFactory;
+		list[i++] = Converter;
+		list[i++] = DefenseTower;
+		list[i++] = PowerPlant;
+		list[i++] = Derrick;
+		list[i++] = NuclearPlant;
+		list[i++] = AutoLab;
+		list[i++] = PowerCaptor;
+		list[i++] = Vault;
+		list[i++] = ExchangePost;
+		list[i++] = StartArea;
+		list[i++] = GoalArea;
+		list[i++] = AlienNest;
+		list[i++] = PracticeBot;
+		list[i++] = TargetBot;
+		list[i++] = WheeledGrabber;
+		list[i++] = TrackedGrabber;
+		list[i++] = WingedGrabber;
+		list[i++] = LeggedGrabber;
+		list[i++] = WheeledSniffer;
+		list[i++] = TrackedSniffer;
+		list[i++] = WingedSniffer;
+		list[i++] = LeggedSniffer;
+		list[i++] = WheeledShooter;
+		list[i++] = TrackedShooter;
+		list[i++] = WingedShooter;
+		list[i++] = LeggedShooter;
+		list[i++] = WheeledOrgaShooter;
+		list[i++] = TrackedOrgaShooter;
+		list[i++] = WingedOrgaShooter;
+		list[i++] = LeggedOrgaShooter;
+		list[i++] = Subber;
+		list[i++] = Recycler;
+		list[i++] = Thumper;
+		list[i++] = Shielder;
+		list[i++] = PhazerShooter;
+		
+		
+		target = radar(list);
+		if (target != null)
+		{
+			message("Enemie trouver !");
+		}
+		else 
+		{
+			message("Enemie eliminer !");
+			message("FIN !good bye !");
+		}
+		
+		turn(direction(target.position));
+		if (distance(position, target.position) < 40)
+		{
+			fire(1);
+		}
+		else 
+		{
+			while ( move(5) != 0 )
+			{
+				turn(180);
+				move(10);
+				turn(90);
+				move(20);
+			}
+			turn(direction(target.position));
+		}
+	}
+}
+

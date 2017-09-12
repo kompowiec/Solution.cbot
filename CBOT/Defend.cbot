@@ -1,0 +1,119 @@
+extern void object::Defend()
+{
+    int enemyType = AlienAnt;      // put enemy category here (i.e. AlienWorm)
+    int parimeterToScan = 50;      // adjust value to look farther if needed 
+	
+    point campSpot = position;     // position/spot to defend (default origin)
+    int maxDistFromCampSpot = 10;  // patrol radius
+	
+    object enemy;
+	
+    while(true)
+    {
+        enemy = radar(enemyType,0,360,0,parimeterToScan);
+
+        if(enemy == null)                                     // if no enemy around 
+            basicMaintE();                                    // fill up on energy if needed 
+        else
+            moveAndDestroy(enemy);                            // otherwise attack
+		
+        enemy = radar(enemyType,0,360,0,parimeterToScan);     // between recharging, enemy spotted?
+
+        if(enemy == null)                                     // if no enemy around 
+             basicMaintS();                                   // fill up on shields if needed
+        else
+	     moveAndDestroy(enemy);                           // otherwise attack
+		
+        enemy = radar(enemyType,0,360,0,parimeterToScan);     // between recharging, enemy spotted?
+
+	if(enemy == null)                                     // if no further enemies around
+	    getBackToPosition(campSpot,maxDistFromCampSpot);  // move back into position
+        else
+           moveAndDestroy(enemy);                             // otherwise attack
+    }
+	
+}
+
+void object::basicMaintE()                             // basic energy maintenance
+{
+    if(energyCell.energyLevel < 0.5)                   // adjust energy tolerance here
+    {
+        object power;
+		
+        if( (power = radar(PowerStation)) != null )    // if there is a powerstation
+        {
+            goto(power.position);                      // go there
+            while(energyCell.energyLevel < 1)          // and fill up
+                wait(1);
+        }
+    }
+}  
+
+void object::basicMaintS()                             // basic shield maintenance
+{
+    if(shieldLevel < 0.8)                              // adjust shield tolerance here
+    {
+        object repair; 
+		
+        if( (repair = radar(RepairCenter)) != null )   // if there is a repaircenter
+        {
+            goto(repair.position);                     // go there
+            while(shieldLevel < 1)                     // and get repaired
+                wait(1);
+        }
+    }
+}
+
+void object::getBackToPosition(point pos, int parimeter)
+{ 
+    float dis = distance(position,pos);
+	
+    if(dis > parimeter)                  // if outside of patrol radius
+    {
+        float dif = pos.z-position.z;
+        float ang = asin(dif/dis);
+		
+        jet(1-(ang/-20));
+		
+        float dir = direction(pos);
+		
+        motor(1-dir/22.5,1+dir/22.5);    // move back into position
+    }
+	
+    else
+    {
+        motor(0,0);                      // otherwise camp
+        if(topo(position) > 0)           // if groundlevel is above water
+            jet(-1);                     // then it's safe to land
+    }
+}
+
+void object::moveAndDestroy(object target)
+{
+    float dir;    // direction of target from shooter
+    float dis;    // distance of target from shooter
+    float dif;    // difference in altitude of target & shooter (relative to sea-level)
+    float ang;    // angle shooter must aim (-20 degrees favorable)
+	
+    dis = distance(position,target.position);
+    dif = target.position.z-position.z;
+    ang = asin(dif/dis);
+	
+    jet(1-(ang/-20));                         // thrust until 20 degress above target
+	
+    dir = direction(target.position); 
+	
+    motor(1-dir/22.5,1+dir/22.5);             // move towards enemy
+	
+    dis = distance(position,target.position);   
+    dif = target.position.z-position.z;         
+    ang = asin(dif/dis);                        
+	
+    aim(ang);                                 // take aim
+	
+    dir = direction(target.position);           
+	
+    if(dis < 30 and dir > -10 and dir < 10)   // if within range
+        fire(0.1);
+}
+

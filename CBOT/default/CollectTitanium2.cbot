@@ -1,0 +1,24 @@
+extern void object::CollectTitanium2()
+{
+	// 1) Definicja zmiennej
+	object  item;            // informacja o obiekcie
+	
+	// 2) Idź do rudy tytanu i podnieś ją
+	item = radar(TitaniumOre);// znajdź rudę tytanu
+	goto(item.position);     // idź do pozycji
+	grab();                  // podnieś porcję rudy
+	
+	// 3) Idź do huty i zostaw rudę
+	item = radar(Converter); // znajdź hutę
+	goto(item.position);     // idź do pozycji
+	drop();                  // zostaw rudę
+	move(-2.5);              // cofnij się o 2,5 m
+		
+	// 4) Naładuj ogniwo elektryczne, jeśli jest w połowie zużyte
+	if ( energyCell.energyLevel < 0.5 )
+	{                               // jeśli tak:
+		item = radar(PowerStation); // znajdź stację energetyczną
+		goto(item.position);        // idź tam
+		wait(5);                    // poczekaj
+	}
+}

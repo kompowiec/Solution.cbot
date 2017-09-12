@@ -1,0 +1,48 @@
+extern void object::CollectTitanium3()
+{
+	// 1) Deklaracje zmiennych.
+	object  item;            // informacja o obiekcie
+	
+	while (true)             // informacja o obiekcie
+	{
+		
+		// 2) Idź do rudy tytanu i podnieś ją
+		item = radar(TitaniumOre);// znajdź rudę tytanu
+		goto(item.position);     // idź do pozycji
+		grab();                  // podnieś porcję rudy
+		
+		// 3) Idź do huty i zostaw rudę
+		item = radar(Converter); // znajdź hutę
+		goto(item.position);     // idź do pozycji
+		drop();                  // zostaw rudę
+		move(-2.5);              // cofnij się o 2,5 m
+		
+		// 4) Poczekaj na przetopienie rudy i zabierz tytan
+		do
+		{
+			wait(1);              // poczekaj na kostkę tytanu
+			item = radar(Titanium, 0, 45, 0, 5);
+		}
+		while ( item == null );
+		goto(item.position);
+		grab();                   // weź ją
+		
+		// 5) Idź do wolnego miejsca i zostaw ją
+		goto(space(position));    // idź do wolnego miejsca
+		drop();                   // zostaw tytan
+		
+		// 6) Naładuj ogniwo elektryczne, jeśli jest w połowie zużyte
+		if ( energyCell.energyLevel < 0.5 )
+		{                         // jeśli tak:
+			item = radar(PowerStation);
+			if ( item != null )   // czy znaleziono stację 
+			{
+				goto(item.position); // idź tam
+				while ( energyCell.energyLevel < 1 )
+				{                 // do czasu naładowania:
+					wait(1);      // czekaj
+				}
+			}
+		}
+	}
+}

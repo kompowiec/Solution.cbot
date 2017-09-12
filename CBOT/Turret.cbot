@@ -1,0 +1,19 @@
+extern void object::Turret()
+{
+	object item;
+	while (true)
+	{
+		item = radar(AlienAnt);
+		
+		if (distance(position, item.position) < 40)
+		
+		{
+			turn(direction(item.position));
+			aim(0);
+			fire(1);
+			
+		}
+	}
+	//I love this game..
+}
+

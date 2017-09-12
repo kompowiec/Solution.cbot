@@ -1,0 +1,95 @@
+extern void object::KillAnts()
+{
+	//preparation
+	object ant;
+	float angle;
+	float sin1;
+	object repair;
+	object power;
+	object ship;
+	
+	ant=radar(AlienAnt);
+	//co kdyby tu uz zadnej ant nebyl?
+	
+	//rise 30metres
+	while(altitude<30){
+		jet(1);
+	}
+	ant=radar(AlienAnt);
+	
+	//main loop
+	while(radar(AlienAnt)!=null){
+		if(ant==null){
+			break;
+		}
+		
+		if(temperature>0.8){
+			while(altitude!=0){
+				jet(-1);
+			}
+			
+			wait(2);
+		}
+		
+		
+		
+		if(shieldLevel<0.5){
+			repair=radar(RepairCenter);
+			goto(repair.position);
+			while(shieldLevel<1){
+				wait(1);
+			}
+		}
+		
+		if(energyCell.energyLevel<0.25){
+			
+			
+			power=radar(PowerStation);
+			goto(power.position);
+			while(energyCell.energyLevel<1){
+				wait(1);
+			}
+			while(altitude<30){
+				jet(1);
+			}
+		}
+		while(altitude<20){
+			jet(1);
+		}
+		//move 20 metres ?before? ant
+		ant=radar(AlienAnt);
+		turn(direction(ant.position));
+		move(distance(position,ant.position)-20);
+		
+		//descent //5 metres above ant
+		if(altitude>ant.altitude){
+			while(altitude>ant.altitude){
+				jet(-1);
+			}
+		}
+		if(altitude<ant.altitude){
+			while(altitude<ant.altitude){
+				jet(1);
+			}
+		}
+		
+		
+		turn(direction(ant.position));
+		//aim!
+		angle=(altitude*altitude)+(distance2d(position,ant.position)*distance2d(position,ant.position));
+		angle=sqrt(angle);
+		sin1=distance2d(position,ant.position)/angle;
+		angle=acos(sin1);
+		ant=radar(AlienAnt);
+		turn(direction(ant.position));
+		aim(angle);
+		fire(0.5);
+		
+		
+	}
+	
+	ship=radar(SpaceShip);
+	goto(ship.position);
+}
+//by ofofce
+

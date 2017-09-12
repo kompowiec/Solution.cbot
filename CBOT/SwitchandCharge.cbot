@@ -1,0 +1,26 @@
+extern void object::SwitchandCharge()
+{
+	drop(Behind); //drop the full cell behind
+	grab(InFront); //take the empty cell infront
+	turn(90); 
+	drop(InFront); //drop the empty cell left
+	turn(-90);
+	grab(Behind); //take the full cell behind
+	drop(InFront); //put full cell in robot
+	turn(90);
+	grab(InFront); //take empty cell
+	
+	point  start;          // variable for initial pos.
+	object item;           // info. about power station
+	
+	start = position;      // stores initial position
+	
+	item = radar(PowerStation); // looks for station
+	goto(item.position);   // goes to the power station
+	
+	wait(5);            // waits until recharged
+	   	
+	goto(start);           // comes back to initial pos.
+	message("Recharge completed");
+}
+

@@ -1,0 +1,163 @@
+extern void object::CollectUranOre()
+{
+	while(true)
+	{
+		if(energyCell.energyLevel <= 0.4)
+		    maint();
+		
+		if(load == null)
+		    retrieveResource(UraniumOre);
+		else
+		{
+			processResource(NuclearPlant);
+			deliverResource(BotFactory);
+		}
+	}
+}
+
+void object::retrieveResource(int category)
+{
+	object resource;
+	
+	while( (resource = radar(category)) == null )
+	{
+		message("No UraniumOre found.  Standing by...");
+		wait(10);    
+	}
+	
+	myGoto(resource.position);
+	
+	errmode(0);
+	grab();
+	errmode(1);
+}
+
+void object::processResource(int category)
+{
+	object building;
+	
+	while( (building = radar(category)) == null )
+	{
+		message("No NuclearPlant found.  Standing by...");
+		wait(10);    
+	}
+	
+	myGoto(triangulate2d(building));
+	myGoto(building.position);
+	
+	drop();
+	
+	move(-3);
+	wait(35);
+	move(1.5);
+	
+	grab();
+}
+
+void object::deliverResource(int category)
+{
+	object dest = radar(category);
+	
+	if(dest == null)
+	    goto(space());
+	else 
+	{
+		errmode(0);
+		if(goto(space(dest.position)) != 0)
+		    goto(space());
+		errmode(1);
+	}
+	    
+	drop();
+	
+	message("NuclearCell delivered.",DisplayInfo);
+}
+
+void object::maint()
+{
+	message("Energy level low.  Searching for energy sources...");
+	
+	while(rechargePlanA() == false and rechargePlanB() == false)
+	{
+		message("Warning.  No energy sources found!");
+		wait(25);
+	}
+	
+	message("Recharge completed.  Resuming job duties...", DisplayInfo);
+}
+
+bool object::rechargePlanA()
+{
+	int cat[];
+	cat[0] = PowerStation; 
+	cat[1] = PowerCaptor;
+	
+	object pwrSource = radar(cat);  
+	
+	if(pwrSource != null)
+	{
+		myGoto(triangulate2d(pwrSource));
+		myGoto(pwrSource.position);
+		
+		message("Recharging at " + pwrSource.category + "...",DisplayInfo);
+		
+		while(energyCell.energyLevel < 1)
+		    wait(1);
+		
+		return true;
+	}
+	
+	return false;
+}
+
+bool object::rechargePlanB()
+{
+	object cell;
+	float min = 0;
+	
+	while( (cell = radar(PowerCell,0,360,min)) != null )
+	{
+		min = distance2d(position,cell.position) + 0.5;
+		
+		if(cell.energyLevel >= 0.5)
+		{
+			goto(cell.position);
+			    
+			message("Swapping with better PowerCell...",DisplayInfo);
+			
+			grab();   
+			drop(Behind);
+			
+			grab(EnergyCell);  
+			drop();
+			
+			grab(Behind);
+			drop(EnergyCell);
+			
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+void object::myGoto(point p)
+{
+	errmode(0);
+	
+	while(goto(p) != 0)
+	    wait(2);    
+	
+	errmode(1);
+}
+
+point object::triangulate2d(object o)
+{
+	point dest = o.position;
+	
+	dest.x += cos(o.orientation) * 15;
+	dest.y += sin(o.orientation) * 15;
+	
+	return dest;
+}
+

@@ -1,0 +1,169 @@
+extern void object::MakeTitanium( )
+{
+	errmode ( 0 );
+	for ( int i=0 ; i<10 ; i=i+1 )
+	{
+		object  obj, item; 
+		point   dest,scrap, storage;
+		int j=0, err=0, h=0;
+		float dist, pl, xt,yt,x,y;
+		do
+		{
+			obj = radar(TitaniumOre);
+		}
+		while ( obj == null );
+		message("TitaniumOre found at X=" + obj.position.x +" Y="+obj.position.y,DisplayInfo);
+		dist=distance(position,obj.position);
+		if(category == LeggedGrabber) { pl = (0.05 + 2.1*(dist*0.0008)); }
+		if(category == WheeledGrabber) { pl = (0.10 + 2.5*(dist*0.0016)); }
+		if(category == TrackedGrabber) { pl = (0.10 + 2.5*(dist*0.0025)); }
+		if(category == Subber) { pl = (0.20 + 2.5*(dist*0.0025));}
+		if(energyCell.category == NuclearCell) { pl = pl * 0.1;}
+		message("Estimated Safe power needed is :"+(pl*100)+"% Current Cell level is:"+ (energyCell.energyLevel*100)+"%",DisplayInfo);
+		if(pl > 1) {
+			message("The nearest Titanium ore is out of the safe power range of a full charge");
+			return;
+		}
+		if(energyCell.energyLevel < pl and energyCell.category != NuclearCell and (radar(PowerStation)) != null) {
+			j=5;
+			do
+			{
+				item = radar(PowerStation,0,360,j-5,j);
+				j+=5;
+				if (item != null) { err = goto(item.position);
+					if(err != 0){item = radar(WayPoint,0,1,0,1);}
+				}
+				if (j >= 600){
+					j=5;
+					message("PowerStation(s) are blocked!",DisplayWarning);
+					wait(30);
+				}
+				
+			}
+			while (item == null);
+			if (item != null){
+				message("The Bot is recharging its power cells.",DisplayInfo);
+				while ( energyCell.energyLevel < 1 )
+				{
+					wait(1);           
+				}
+				
+			}
+		}
+		else {
+			if (category != Subber) {
+				if(energyCell.energyLevel < pl ) {
+					message("The Bot is changing power cells.",DisplayInfo);
+					j= 5;
+					do{
+						item = radar(PowerCell,0,360,j-5,j);
+						if (item == null) {item = radar(NuclearCell,0,360,j-5,j);}
+						j+=5;
+						if (item != null) {if (item.energyLevel <= 0.8) {
+								item = radar(WayPoint,0,1,0,1);}
+						}
+						if (j >= 400){
+							j=5;
+							message("Bot Cannot find any energy cells.",DisplayInfo);
+							wait(30);
+							
+						}
+					}
+					while ( item == null );
+					
+					do{
+						err = goto(item.position);
+						if (err != 0) { 
+							message("powercell get error.. trying again.",DisplayInfo);
+							turn(120);
+							move(15);
+						}
+					}
+					while(err !=0 );
+					grab(InFront);     // take the new cell in front
+					drop(Behind);      // and drop it behind
+					
+					grab(EnergyCell);  // take the cell from the bot
+					drop(InFront);     // and drop it in front
+					
+					grab(Behind);      // take the new cell
+					drop(EnergyCell);  // and drop it on the bot
+					
+				}
+				else{ if(energyCell.energyLevel < pl ) {
+					item = radar(SpaceShip);
+					goto(item.position);
+					message("Subber needs a Cell change at SpaceShip.",DisplayError);}
+				}
+			}
+		}
+		do
+		{
+			obj = radar(TitaniumOre);
+		}
+		while ( obj == null );
+		do{
+			err = goto(obj.position);
+			if (err != 0) {message("T.ore Get error, Trying again.",DisplayInfo);
+				turn(120);
+				move(15);
+			}
+		}
+		while(err !=0 );
+		
+		grab();  // grab the titanium ore
+		
+		obj = radar(Converter);
+		if ( obj == null )  return;
+		do{
+			err = goto(obj.position);
+			if (err != 0) {message("T.ore delivery error, Trying again.",DisplayInfo);
+				turn(120);
+				move(15);
+			}
+		}
+		while(err !=0 );
+		drop(); 
+		move(-2.5);  
+		do
+		{
+			obj = radar(Titanium, 0, 360, 0, 5);
+		}
+		while ( obj == null );
+		goto(obj.position);
+		grab();
+		if ( i > 2 ){
+			i=0;
+			h=h+1;
+		}
+		x=i*2+5;
+		y=-(h)*2+10;
+		scrap=position;
+		xt = (x * cos(orientation)) + (y * sin(orientation));
+		yt = (y * cos(orientation)) - (x * sin(orientation));
+		//message("X="+xt+"Y="+yt);
+		scrap.x = position.x + xt;
+		scrap.y = position.y + yt;
+		//message("X="+scrap.x+"Y="+scrap.y);
+		storage = space(scrap,0,100,2);
+		if (storage.x == nan) {
+			message("bad.");
+		}
+		message("Titanium being stored tenitivly at: X="+storage.x+" Y="+storage.y,DisplayInfo);
+		err = goto(storage);
+		if (err != 0) {
+			message("T storage errorin moving to space",DisplayInfo);
+			goto(space(storage,4,100,2));drop();
+		}
+		err = drop(); 
+		
+		if (err != 0) {
+			message("T storage error. finding open spot",DisplayInfo);
+			goto(space(position,0,100,2));drop();
+		}
+		    
+		move(-2.5);
+		
+	}
+}
+

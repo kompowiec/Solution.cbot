@@ -1,0 +1,143 @@
+// This program was designed for the Shielder
+// to repair stationary objects (i.e. buildings).
+// If you want to include (damaged) bots, they 
+// must remain still during the repair.
+
+extern void object::RepairBase()
+{
+	bool includeBots = false;  // You decide.
+	
+	object allies[];
+	
+	allies = findAllies(includeBots);
+	
+	for(int i = 0; i < sizeof(allies); i++)
+	{
+		if(distance2d(position,allies[i].position) > 26)
+		{
+			turn(direction(allies[i].position)); 
+			
+			for(int d = 24; d >= 5; d--)
+			{
+				point dest = triangulate2d(allies[i].position,d);
+				
+				errmode(0);
+				if( goto(dest) == 0 )
+				    break;
+				errmode(1);   
+			}
+			
+			if(distance2d(position,allies[i].position) > 26)
+			{
+				message("Could not goto " + allies[i].category + ".", DisplayError);
+				return;
+			}   
+		}
+		
+		while(allies[i].shieldLevel < 1)
+		    shield(1,distance2d(position,allies[i].position));
+		message(allies[i].category + " repaired.  (" + (i+1) + "/" + sizeof(allies) + ")", DisplayInfo);
+		
+		shield(0,0);
+	}   
+	
+	message("All repaired.", DisplayInfo);
+}
+
+object[] object::findAllies(bool repairAll)
+{
+	
+	int allyList[];
+	int i = 0;
+	
+	allyList[i++] = Derrick;
+	allyList[i++] = BotFactory;
+	allyList[i++] = PowerStation;
+	allyList[i++] = PowerCaptor;
+	allyList[i++] = Converter;
+	allyList[i++] = RepairCenter;
+	allyList[i++] = DefenseTower;
+	allyList[i++] = ResearchCenter;
+	allyList[i++] = RadarStation;
+	allyList[i++] = ExchangePost;
+	allyList[i++] = PowerPlant;
+	allyList[i++] = AutoLab;
+	allyList[i++] = NuclearPlant;
+	
+	if(repairAll)
+	{
+		allyList[i++] = WingedGrabber;
+		allyList[i++] = TrackedGrabber;
+		allyList[i++] = WheeledGrabber;
+		allyList[i++] = LeggedGrabber;
+		allyList[i++] = WingedShooter;
+		allyList[i++] = TrackedShooter;
+		allyList[i++] = WheeledShooter;
+		allyList[i++] = LeggedShooter;
+		allyList[i++] = WingedOrgaShooter;
+		allyList[i++] = TrackedOrgaShooter;
+		allyList[i++] = WheeledOrgaShooter;
+		allyList[i++] = LeggedOrgaShooter;
+		allyList[i++] = WingedSniffer;
+		allyList[i++] = TrackedSniffer;
+		allyList[i++] = WheeledSniffer;
+		allyList[i++] = LeggedSniffer;
+		allyList[i++] = Thumper;
+		allyList[i++] = PhazerShooter;
+		allyList[i++] = Recycler;
+		allyList[i++] = Shielder;
+		allyList[i++] = Subber;
+	}
+	
+	
+	object allies[];
+	object tempObject;
+	
+	i = 0;
+	int j = 0;
+	int k = 0;
+	
+	while( (tempObject = retobject(i++)) != null )
+	{
+		for(j = 0; j < sizeof(allyList); j++)
+		{
+			if(tempObject.category == allyList[j] and tempObject.shieldLevel < 1)
+			{
+				message(tempObject.category + " needs repair.");
+				allies[k++] = tempObject;
+				break;
+			}    
+		}
+	}
+	
+	for(i = sizeof(allies)-1; i > 0; i--)
+	{
+		for(j = 0; j < i; j++)
+		{
+			if(distance2d(position,allies[j].position) > distance2d(position,allies[j+1].position))
+			{
+				tempObject  = allies[j];
+				allies[j]   = allies[j+1];
+				allies[j+1] = tempObject;
+			}
+		}
+	}
+	
+	return allies;
+}
+
+
+point object::triangulate2d(point p,int dist)
+{
+	point dest = p;
+	float angl = orientation+180;
+	
+	if(angl > 360)
+	    angl -= 360;
+	
+	dest.x += cos(angl) * dist;
+	dest.y += sin(angl) * dist;
+	
+	return dest;
+}
+

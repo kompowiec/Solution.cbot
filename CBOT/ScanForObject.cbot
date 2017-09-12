@@ -1,0 +1,26 @@
+extern void object::ScanforObject()
+{
+	object item;
+	int number=0;
+	float min=0,max=1000;
+	string catname;
+	do{
+		// >>>>>>> change category here <<<<<<<
+		item=radar(PowerCell,0,360,min,max,1);
+		// >>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<
+		
+		if(item!=null)
+		{
+			++number;
+			min=distance(position,item.position)+0.01;
+			catname="["+item.category+"s]";
+		}
+	}while(item!=null);
+	if(number==0)
+		message("[none found]",DisplayInfo);  
+	else
+		message(catname +": "+number,DisplayInfo);
+	
+	// AI <d.e.m@gmx.net>
+}
+
