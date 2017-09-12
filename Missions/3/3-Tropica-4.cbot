@@ -1,0 +1,156 @@
+// Nazwa: FlyAndShoot
+// Krotki opis: Program do misji 3.4
+// Dlugi opis: Program do misji 3.4. W jednym miejscu wymaga pomocy uzytkownika.
+// Autor: krzys_h
+// Wersja: BETA 1.0
+// Data ostatniej zmiany: 2012-02-15 13:25
+bool object::inRangePlus(point pos, float range) {
+	if(this.position.z > pos.z+range) return true;
+	return false;
+}
+
+bool object::inRangeMinus(point pos, float range) {
+	if(pos.z-range > this.position.z) return true;
+	return false;
+}
+
+bool object::inRange(point pos, float range) {
+	if(pos.z-range < this.position.z && this.position.z < pos.z+range) return true;
+	return false;
+}
+
+bool object::inDirectionRange(point pos, float range) {
+	if(direction(pos) < range && direction(pos) > -range) return true;
+	return false;
+}
+
+public boolean object::widocznosc(point cel, int odc) 
+{ 
+	point pkt; 
+	float D; 
+	float x1m, y1m, z1m; 
+	 
+	D = distance(this.position, cel); 
+
+	x1m = (cel.x - this.position.x) / D; 
+	y1m = (cel.y - this.position.y) / D; 
+	z1m = (cel.z - this.position.z) / D; 
+	   
+	for (int i=odc; i < D; i=i+odc) 
+	{ 
+		pkt.x = this.position.x + (i * x1m); 
+		pkt.y = this.position.y + (i * y1m); 
+		pkt.z = this.position.z + (i * z1m); 
+		if (pkt.z < topo(pkt)) return false; 
+	} 
+	return true; 
+}
+
+extern void object::FlyAndShoot()
+{
+	
+	object item;
+	float engine = 0;
+	point cel;
+	float H, L, alfa;
+	int Targets[], a=0;
+	Targets[a++] = Target2;
+	Targets[a++] = TargetBot;
+	
+	while(true) {
+		item = radar(Targets);
+		if(item == null) break;
+		if(item.category == Target2) {
+			if(widocznosc(item.position, 5)) {
+				if(item.position.z > this.position.z) {
+					engine = 1.0;
+				}
+				if(item.position.z < this.position.z) {
+					engine = -1.0;
+				}
+				if(inRangeMinus(item.position, 5)) {
+					engine = 0.5;
+				}
+				if(inRangePlus(item.position, 5)) {
+					engine = -0.5;
+				}
+				if(inRangeMinus(item.position, 2.5)) {
+					engine = 0.25;
+				}
+				if(inRangePlus(item.position, 2.5)) {
+					engine = -0.25;
+				}
+				if(inRange(item.position, 1)) {
+					engine = 0;
+					message("Me:"+this.position.z+" Target:"+item.position.z+" Dist: "+distance2d(this.position, item.position), DisplayInfo);
+				} else message("Me:"+this.position.z+" Target:"+item.position.z+" Dist: "+distance2d(this.position, item.position));
+			} else {
+				engine = 1; //Jak cel zasloniety to do gory! :D
+			}
+			if(!inDirectionRange(item.position, 1)) {
+				message("Me:"+this.position.z+" Target:"+item.position.z+" Dist: "+distance2d(this.position, item.position), DisplayWarning);
+				turn(direction(item.position));
+			}
+			if(inRange(item.position, 1)) {
+				motor(1,1);
+			} else {
+				if(distance2d(this.position, item.position) > 10) {
+					motor(1,1);
+				} else {
+					motor(0.5,0.5);
+				}
+			}
+			jet(engine);
+			if(this.temperature > 1-((this.position.z-topo(this.position))*0.006)) {
+				message("Me:"+this.position.z+" Target:"+item.position.z+" Dist: "+distance2d(this.position, item.position), DisplayError);
+				jet(-1);
+				while( this.temperature > 0 );
+			}
+		} else {
+			jet(0);
+			motor(0,0);
+			
+			do {
+				cel = item.position;
+				
+				turn(direction(cel));
+				
+				if(distance(cel, this.position) > 30) move(distance(cel, this.position)-30);
+
+				if(!widocznosc(cel, 2)) {
+					jet(1);
+					while(!widocznosc(cel, 2));
+				}
+				
+				do {
+					H = cel.z - this.position.z; 
+					L = distance2d(cel, this.position); 
+					alfa = atan(H/L);
+					if(alfa < -20) jet(-0.25);
+					if(alfa > 20) jet(0.25);
+				} while(alfa < -20 || alfa > 20);
+				aim(alfa);
+				
+				turn(direction(cel));
+
+				fire(0.1);
+				
+				if(this.temperature > 1-((this.position.z-topo(this.position))*0.006)) {
+					message("Me:"+this.position.z+" Target:"+item.position.z+" Dist: "+distance2d(this.position, item.position), DisplayError);
+					jet(-1);
+					while( this.temperature > 0 );
+				}
+			} while(item != null);
+		}
+	}
+	message("FINISHED", DisplayWarning);
+	message("FINISHED", DisplayWarning);
+	message("FINISHED", DisplayWarning);
+	message("FINISHED", DisplayWarning);
+	jet(0);
+	motor(0,0);
+	item = radar(SpaceShip);
+	wait(1);
+	goto(item.position);
+	
+}
