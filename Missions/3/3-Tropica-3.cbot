@@ -6,11 +6,6 @@ extern void object::Tropica3()
 	
 	if(category ==WingedGrabber)
 	{
-	item = radar(Titanium);
-	errcode = goto(item.position);
-	while(errcode != 0) errcode = goto(item.position);
-	grab(); 
-
 		item = radar(PowerCell); 
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);

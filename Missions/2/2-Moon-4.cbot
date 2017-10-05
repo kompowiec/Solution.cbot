@@ -25,14 +25,14 @@ extern void object::MoonBlackBox()
 
 //5)Place the grabbers at the center of the power station platform to recharge them. The cells should still have a little power left in them, just enough to radio-control the bots onto the platform.
 	item = radar(PowerStation);
-	goto(item.position);
-	while(errcode != 0)
-		while ( energyCell.energyLevel < 1 )
+	if(item == null) message("Waiting for PowerStation to be built.");
+	while(item == null) item = radar(PowerStation);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	while ( energyCell.energyLevel < 1 )
 		{
 			wait(1); 
 		}
-
-//4)Zbuduj radar a czarna skrzynka pojawi się na mapce
 
 	item = radar(TitaniumOre);
 	errcode = goto(item.position);
@@ -51,9 +51,9 @@ extern void object::MoonBlackBox()
 
 //TO THIS MOMENT HERE APP WOKRS FINE
 }
-else
+else if(category == WingedGrabber)
 {
-	while(item == null) item = radar(PowerStation); 
+	item = radar(PowerStation); 
 	goto(item.position);
 	while ( energyCell.energyLevel < 1 )
 	{
