@@ -1,11 +1,13 @@
-extern void object::SwitchCell1()
+extern void object::Recharge1()
 {
-	grab(InFront);     // podnieś nowe ogniwo z przodu
-	drop(Behind);      // i zostaw je z tyłu
+	point  start;          // variable for initial pos.
+	object item;           // info. about power station
 	
-	grab(EnergyCell);  // wyjmij ogniwo z robota
-	drop(InFront);     // i zostaw je z przodu
+	start = position;      // store initial position
 	
-	grab(Behind);      // podnieś nowe ogniwo
-	drop(EnergyCell);  // i włóż je do robota
+	item = radar(PowerStation); // look for station
+	goto(item.position);   // go to the power station
+	wait(5);               // wait 5 seconds
+	
+	goto(start);           // go back to initial pos.
 }

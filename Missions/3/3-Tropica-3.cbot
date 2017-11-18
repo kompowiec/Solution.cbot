@@ -1,26 +1,42 @@
 extern void object::Tropica3()
 {
+
 	object item;
 	int errcode;
 	errmode(0);
 	
-	if(category ==WingedGrabber)
+	if(category ==WingedGrabber) 
 	{
+//1) There is a titanium cube west of your present location, near the blue flag/blue cross on your mini map. You don't need to move the cube, just build a power station right there on the spot.
 		item = radar(PowerCell); 
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);
 		grab();
 		
-	item = radar(PowerStation);
-	if(item == null) message("Waiting for PowerStation to be built.");
-	while(item == null) item = radar(PowerStation);
-	errcode = goto(item.position);
-	while(errcode != 0)
-	while ( energyCell.energyLevel < 1 )
-	{
-		wait(1);            // wait until recharged
-	}
+		item = radar(PowerStation);
+		if(item == null) message("Waiting for PowerStation to be built.");
+		while(item == null) item = radar(PowerStation);
+		errcode = goto(item.position);
+		while(errcode != 0)
+		while ( energyCell.energyLevel < 1 )
+		{
+			wait(5);            // wait until recharged
+		}
 
+		item = radar(Titanium); 
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		grab();
+		
+		goto(space(position));    
+		drop();                  
+
+		item = radar(PowerCell); 
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		grab();
+
+//2) With the titanium cubes on the spaceship, build a research center and execute the <shooter cannon research program> C.
 		item = radar(ResearchCenter);
 		if(item == null) message("Waiting for Researchcenter to be built.");
 		while(item == null) item = radar(ResearchCenter);
@@ -49,6 +65,7 @@ extern void object::Tropica3()
 		
 		message("Bot factory loaded. Create new bot.");
 		
+//3) Build a bot factory and a winged shooter. If this bot is destroyed by enemy fire, you will find some additional titanium cubes in a small foggy valley northwest of the spaceship. You can bring them back with the winged grabber.
 		item = radar(PowerCell); 
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);
@@ -66,11 +83,13 @@ extern void object::Tropica3()
 	{
 		while(item != null)
 		{
+//4) Build a radar station in order to see the location of the ants on the mini-map, and let the hunt begin. Be careful not to run out of energy and not to overheat the reactor of a bot while over water. If a bot falls into deep water, it explodes.
 			item = radar(AlienAnt,0,360,100,1000);
 			errcode = goto(item.position);
 			aim(0);
 			fire(0.1);
 			while(energyCell.energyLevel < 1) wait(0.5);
+//5) Once you have killed all the ants, get on board and take off.
 		}
 		message(category + ": Mission complete.");
 	}

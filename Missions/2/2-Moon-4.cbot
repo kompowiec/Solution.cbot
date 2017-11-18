@@ -51,14 +51,18 @@ extern void object::MoonBlackBox()
 
 //TO THIS MOMENT HERE APP WOKRS FINE
 }
-else if(category == WingedGrabber)
+else
 {
-	item = radar(PowerStation); 
-	goto(item.position);
+	item = radar(PowerStation);
+	while(item == null) item = radar(PowerStation);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
 	while ( energyCell.energyLevel < 1 )
-	{
-		wait(1); 
-	}
+		{
+			wait(1); 
+		}
+
+
 //6)Radio-control the winged grabber to the black box and back.
 //7) Gather both grabbers and the black box onto the spaceship platform and climb on board yourself.
 		item = radar(BlackBox);
