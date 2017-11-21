@@ -49,7 +49,6 @@ extern void object::MoonBlackBox()
 	item = radar(SpaceShip);
 	goto(item.position);
 
-//TO THIS MOMENT HERE APP WOKRS FINE
 }
 else
 {

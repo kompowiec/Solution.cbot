@@ -8,11 +8,6 @@ extern void object::Tropica3()
 	if(category ==WingedGrabber) 
 	{
 //1) There is a titanium cube west of your present location, near the blue flag/blue cross on your mini map. You don't need to move the cube, just build a power station right there on the spot.
-		item = radar(PowerCell); 
-		errcode = goto(item.position);
-		while(errcode != 0) errcode = goto(item.position);
-		grab();
-		
 		item = radar(PowerStation);
 		if(item == null) message("Waiting for PowerStation to be built.");
 		while(item == null) item = radar(PowerStation);
@@ -20,8 +15,13 @@ extern void object::Tropica3()
 		while(errcode != 0)
 		while ( energyCell.energyLevel < 1 )
 		{
-			wait(5);            // wait until recharged
+			wait(1);            // wait until recharged
 		}
+
+		item = radar(PowerCell); 
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		grab();
 
 		item = radar(Titanium); 
 		errcode = goto(item.position);
@@ -51,17 +51,13 @@ extern void object::Tropica3()
 	while(errcode != 0) errcode = goto(item.position);
 	grab(); 
 		
+		goto(space(position));    
+		drop();                  
+
 		item = radar(BotFactory);
 		if(item == null) message("Waiting for Botfactory to be built.");
 		while(item == null) item = radar(BotFactory);
 		errcode = goto(item.position);
-		while(errcode != 0)
-		{
-			turn(direction(item.position));
-			move(distance2d(position, item.position));
-			errcode = goto(item.position);
-		}
-		drop();
 		
 		message("Bot factory loaded. Create new bot.");
 		
