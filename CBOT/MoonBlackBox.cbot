@@ -1,55 +1,55 @@
 extern void object::MoonBlackBox()
 {
-	object rdr;
+	object item;
 	int errcode;
 	
 	errmode(0);
 	
 	if(category == WheeledGrabber)
 	{
-		rdr = radar(WingedGrabber,0,360,0,100);
+		item = radar(WingedGrabber,0,360,0,100);
 		message("Waiting for WingedGrabber to leave");
-		while(rdr != null) rdr = radar(WingedGrabber,0,360,0,100);
+		while(item != null) item = radar(WingedGrabber,0,360,0,100);
 		
-		rdr = radar(PowerStation);
-		goto(rdr.position);
+		item = radar(PowerStation);
+		goto(item.position);
 		while(energyCell.energyLevel < 1) wait(0.5);
 		
-		rdr = radar(SpaceShip);
-		goto(rdr.position);
+		item = radar(SpaceShip);
+		goto(item.position);
 		message("Making room for the WingedGrabber");
-		rdr = radar(TitaniumOre,0,360,0,10);
-		while(rdr != null)
+		item = radar(TitaniumOre,0,360,0,10);
+		while(item != null)
 		{
-			goto(rdr.position);
+			goto(item.position);
 			grab();
-			goto(space(rdr.position));
+			goto(space(item.position));
 			drop();
-			rdr = radar(SpaceShip);
-			goto(rdr.position);
-			rdr = radar(TitaniumOre,0,360,0,10);
+			item = radar(SpaceShip);
+			goto(item.position);
+			item = radar(TitaniumOre,0,360,0,10);
 		}
 	}
 	else
 	{
-		rdr = radar(PowerStation);
+		item = radar(PowerStation);
 		
 		message("Looking for PowerStation");
-		while(rdr == null) rdr = radar(PowerStation);
-		errcode = goto(rdr.position);
+		while(item == null) item = radar(PowerStation);
+		errcode = goto(item.position);
 		while(errcode != 0)
 		{
-			turn(direction(rdr.position));
-			move(distance2d(position, rdr.position));
-			errcode = goto(rdr.position);
+			turn(direction(item.position));
+			move(distance2d(position, item.position));
+			errcode = goto(item.position);
 		}
 		while(energyCell.energyLevel < 1) wait(0.5);
 		message("Going to get the BlackBox now");
-		rdr = radar(BlackBox);
-		goto(rdr.position);
+		item = radar(BlackBox);
+		goto(item.position);
 		grab();
-		rdr = radar(SpaceShip);
-		goto(rdr.position);
+		item = radar(SpaceShip);
+		goto(item.position);
 		drop();
 	}
 	message(category + ": Mission Complete.");

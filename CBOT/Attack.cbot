@@ -1,49 +1,67 @@
+// My new attack program.
+// Aiming and enemy seeking has been improved.
+// It works with all shooters (legged, winged, etc.)
+// against all enemy races (ant, wasp, etc.).
+// Because there is a bug with pitch value not being
+// recognized correctly while in 1st-person camera view,
+// I recommend switching camera view to 3rd-person for best
+// results.  Happy Hunting!
+
 extern void object::Attack()
 {
-    object enemy;
+	int cat[];                
+	 
+	cat[0] = AlienAnt;
+	cat[1] = AlienWorm;
+	cat[2] = AlienWasp;
+	cat[3] = AlienSpider;
+	cat[4] = AlienEgg;
 	
-    while(true)
-    {
-        enemy = radar(AlienAnt);         // put enemy category here (i.e. AlienWorm)
+	while(true)
+	{
+		object enemy = radar(cat);
 		
-        if(enemy != null)                // if enemy exists/spotted on map
-            moveAndDestroy(enemy);
-        else
-        {
-            message("No Enemies Spotted!");	
-            return;
-        }	
-		    	
-    }
+		if(enemy != null)
+		    moveAndDestroy(enemy);
+	}
 }
-
 
 void object::moveAndDestroy(object target)
 {
-    float dir;    // direction of target from shooter
-    float dis;    // distance of target from shooter
-    float dif;    // difference in altitude of target & shooter (relative to sea-level)
-    float ang;    // angle shooter must aim (-20 degrees favorable)
+	float dir;
+	float dis;
+	float dif;
+	float ang;
+
+	object infront = radar(target.category,0,45,0,45);
 	
-    dis = distance(position,target.position);
-    dif = target.position.z-position.z;
-    ang = asin(dif/dis);
+	if(infront != null)
+	    target = infront;
+		
+	dir = direction(target.position); 
+	dis = distance(position,target.position);
 	
-    jet(1-(ang/-20));                         // thrust until 20 degress above target
+	if(dir > 45 and dis < 10)
+	    motor(-1,0);
+	else if(dir < -45 and dis < 10)
+	    motor(0,-1);
+	else 
+	    motor(1-dir/22.5,1+dir/22.5);
 	
-    dir = direction(target.position); 
+	dis = distance(position,target.position);   
+	dif = target.position.z-position.z;         
+	ang = asin(dif/dis);
 	
-    motor(1-dir/22.5,1+dir/22.5);             // move towards enemy
+	jet(1-ang/-20);
 	
-    dis = distance(position,target.position);   
-    dif = target.position.z-position.z;         
-    ang = asin(dif/dis);                        
+	dir = direction(target.position); 
+	dis = distance(position,target.position);   
+	dif = target.position.z-position.z;         
+	ang = asin(dif/dis)-pitch;   
 	
-    aim(ang);                                 // take aim
+	aim(ang);
 	
-    dir = direction(target.position);           
-	
-    if(dis < 30 and dir > -10 and dir < 10)   // if within range
-        fire(0.1);
+	if(dis < 40 and -15 < dir and dir < 15 and -25 < ang and ang < 25)  
+	    fire(0.1);
 }
 
