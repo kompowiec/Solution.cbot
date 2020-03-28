@@ -1,28 +1,36 @@
 extern void object::Tropica5()
 {//various
-	object item; //information about object
-	int i;
+	object item;
+	int i = 0;
+	float range = 0;
+	int errcode = 0;
 	
 	
-	if(category ==WheeledGrabber) //1) Instructions for Wheeled Grabber.
+	if(category ==WheeledGrabber)
 	{
-		for(int i = 0; i < 2; i++) //go to 2 TitaniumOre
+		for(int i = 0; i < 2; i++)
 		{
+//2) Build a converter near the chunks of titanium ore. You'll find them in the vicinity of the spaceship to the east.
+//3) Produce two cubes.
 			item = radar(TitaniumOre);
 			goto(item.position);
 			grab();
 			
 			item = radar(Converter);
 			if(item == null) message("Waiting for Conveter to be bulid.");
+			item = radar(Converter);
+			if(item == null) message("Waiting to building Converter");
 			while(item == null) item = radar(Converter);
-			i = goto(item.position);
-			while(i != 0) i = goto(item.position);
+			errcode = goto(item.position);
+			while(errcode != 0) errcode = goto(item.position);
 			drop();
 			move(-2.5);
-			wait(1);             
+			
 			while(item == null) item = radar(Titanium);
-			goto(item.position);
-			grab();              
+			errcode = goto(item.position);
+			while(errcode != 0) errcode = goto(item.position);
+			wait(15);
+			grab();
 			
 			goto(space(position)); 
 			drop();               
@@ -31,10 +39,16 @@ extern void object::Tropica5()
 		goto(item.position);
 		grab();
 		
-		if(item == null) message("Waiting for BotFactory to be build.");
+		item = radar(BotFactory);
+		if(item == null) message("Waiting for Botfactory to be built.");
 		while(item == null) item = radar(BotFactory);
-		i = goto(item.position);
-		while(i != 0) i = goto(item.position);
+		errcode = goto(item.position);
+		while(errcode != 0)
+		{
+			turn(direction(item.position));
+			move(distance2d(position, item.position));
+			errcode = goto(item.position);
+		}
 		drop();
 		message("Titanium loaded into BotFactory");
 		
@@ -44,7 +58,7 @@ extern void object::Tropica5()
 
 		if(item == null) message("Waiting for Subber to be bulid.");
 		while(item == null) item = radar(Subber);
-		goto(item.position);
+		errcode = goto(item.position);
 		drop();
 		
 		item = radar(SpaceShip);
