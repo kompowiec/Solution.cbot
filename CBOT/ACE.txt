@@ -1,17 +1,0 @@
-extern void object::Nowy()
-{
-
-string s = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-s += "BBBB"; // var_24
-s += "BBBB"; // pStatic
-s += "µ®pStaticBBBB"; // var_1C
-s += "BBBB"; // var_14
-s += "BBBB"; // p
-s += "HÅéÏBBBB"; // var_C
-s += "BBBBBBBB"; // var_4
-s += "var_40000P1BBBBBBBB¸®var_40000P1BBBBBBBB°var_40000P1BBBBBBBB";
-s += "¸DÌê¾ÝÂÙt$ô[+É±21CC¯KÓ!O´+²0<ÎpZ´@(É8*|ùË^©while{Ô!|Eó þ ?W5Ãx´ÑÀkU·®%0°Sý3Âuj1åZxý¿#2vÅ^E iiÓsØNiÓsØN­±çÏmóhå";
-while(true) wait(1);
-
-}
-\\author: krzys_h

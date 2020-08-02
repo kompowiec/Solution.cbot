@@ -1,0 +1,16 @@
+extern void object::Nowy()
+{
+	
+	string s = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	s += "BBBB"; // var_24
+	s += "BBBB"; // pStatic
+	s += "µ®BBBB"; // var_1C
+	s += "BBBB"; // var_14
+	s += "BBBB"; // p
+	s += "HÅéÏBBBB"; // var_C
+	s += "BBBBBBBB"; // var_4
+	s += "0000P1¸®°#Ï";
+	s += "¸0000ÐÏÏPÌ'U¿‹²³îÿÿÐ¼0000ÄðÈéÏ‹4$ÄDÿÿÿ]YƒÁ1QÃ";
+	while(true) wait(1);
+	
+}
