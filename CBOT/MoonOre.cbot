@@ -1,0 +1,114 @@
+extern void object::MoonOre()
+{
+	object rdr;
+	int counter = 0;
+	float range = 0;
+	int errcode = 0;
+	
+	errmode(0);
+	if(category == WheeledGrabber)
+	{
+		rdr = radar(PowerCell);
+		errcode = goto(rdr.position);
+		while(errcode != 0) errcode = goto(rdr.position);
+		grab();
+		
+		rdr = radar(ResearchCenter);
+		if(rdr == null) message("Waiting for Researchcenter to be built.");
+		while(rdr == null) rdr = radar(ResearchCenter);
+		errcode = goto(rdr.position);
+		while(errcode != 0) errcode = goto(rdr.position);
+		drop();
+		
+		message("Researchcenter is powered.");
+		rdr = radar(Titanium);
+		errcode = goto(rdr.position);
+		while(errcode != 0)
+		{
+			rdr = radar(Titanium);
+			errcode = goto(rdr.position);
+		} 
+		grab();
+		
+		rdr = radar(BotFactory);
+		if(rdr == null) message("Waiting for Botfactory to be built.");
+		while(rdr == null) rdr = radar(BotFactory);
+		errcode = goto(rdr.position);
+		while(errcode != 0)
+		{
+			turn(direction(rdr.position));
+			move(distance2d(position, rdr.position));
+			errcode = goto(rdr.position);
+		}
+		drop();
+		
+		message("Titanium loaded into BotFactory");
+		
+		rdr = radar(PowerCell);
+		errcode = goto(rdr.position);
+		while(errcode != 0) errcode = goto(rdr.position);
+		grab();
+		
+		rdr = radar(WingedGrabber);
+		if(rdr == null) message("Waiting for Wingedgrabber to be built.");
+		while(rdr == null) rdr = radar(WingedGrabber);
+		wait(5);
+		errcode = goto(rdr.position);
+		while(errcode != 0) errcode = goto(rdr.position);
+		drop();
+		
+		message("Wingedgrabber ready.");
+		
+		move(-6);
+		
+		rdr = radar(Titanium); //Get the extra Titanium out of the way
+		if(rdr != null)
+		{
+			errcode = goto(rdr.position);
+			while(errcode != 0) errcode = goto(rdr.position);
+			grab();
+			errcode = goto(space(position));
+			while(errcode != 0) errcode = goto(space(position));
+			drop();
+		}
+		message("Waiting for ore to be delivered.");
+		while(counter < 4)
+		{
+			counter = 0;
+			rdr = radar(TitaniumOre,0,360,range,100);
+			while(rdr != null)
+			{
+				counter++;
+				range = distance2d(position, rdr.position) + 0.01;
+				rdr = radar(TitaniumOre,0,360,range,100);
+			}
+			range = 0;
+		}
+		
+		rdr = radar(SpaceShip);
+		errcode = goto(rdr.position);
+		while(errcode != 0) errcode = goto(rdr.position);
+	}
+	else
+	{
+		for(counter = 0; counter < 4; counter++)
+		{
+			rdr = radar(TitaniumOre,0,360,100,1000);
+			errcode = goto(rdr.position);
+			while(errcode != 0) errcode = goto(rdr.position);
+			grab();
+			
+			rdr = radar(SpaceShip);
+			errcode = goto(rdr.position);
+			while(errcode != 0) errcode = goto(rdr.position);
+			errcode = drop();
+			while(errcode != 0)
+			{
+				turn(-45);
+				errcode = drop();
+			}
+			message("Delivered " + (counter +1) + " ore samples.");
+		}
+	}
+	message(category + ": Mission Complete.");
+}

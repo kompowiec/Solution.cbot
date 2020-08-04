@@ -1,156 +1,204 @@
-// Nazwa: FlyAndShoot
-// Krotki opis: Program do misji 3.4
-// Dlugi opis: Program do misji 3.4. W jednym miejscu wymaga pomocy uzytkownika.
-// Autor: krzys_h
-// Wersja: BETA 1.0
-// Data ostatniej zmiany: 2012-02-15 13:25
-bool object::inRangePlus(point pos, float range) {
-	if(this.position.z > pos.z+range) return true;
-	return false;
-}
+// This is a rough stab (my first) at a WingedShooter program, and it seems to work fairly well on
+// the last mission of the demo (ants on the hill one).  If you improve on it, or have any
+// comments, send me an email, and please include your improved version if you have one:
+// sclover@abac.com
 
-bool object::inRangeMinus(point pos, float range) {
-	if(pos.z-range > this.position.z) return true;
-	return false;
-}
-
-bool object::inRange(point pos, float range) {
-	if(pos.z-range < this.position.z && this.position.z < pos.z+range) return true;
-	return false;
-}
-
-bool object::inDirectionRange(point pos, float range) {
-	if(direction(pos) < range && direction(pos) > -range) return true;
-	return false;
-}
-
-public boolean object::widocznosc(point cel, int odc) 
-{ 
-	point pkt; 
-	float D; 
-	float x1m, y1m, z1m; 
-	 
-	D = distance(this.position, cel); 
-
-	x1m = (cel.x - this.position.x) / D; 
-	y1m = (cel.y - this.position.y) / D; 
-	z1m = (cel.z - this.position.z) / D; 
-	   
-	for (int i=odc; i < D; i=i+odc) 
-	{ 
-		pkt.x = this.position.x + (i * x1m); 
-		pkt.y = this.position.y + (i * y1m); 
-		pkt.z = this.position.z + (i * z1m); 
-		if (pkt.z < topo(pkt)) return false; 
-	} 
-	return true; 
-}
-
-extern void object::FlyAndShoot()
+extern void object::FlyingShooter()
 {
+	object item = null;
+	point loc;
+	float fire_angle;
+	float ground;
+	float z_diff;
 	
-	object item;
-	float engine = 0;
-	point cel;
-	float H, L, alfa;
-	int Targets[], a=0;
-	Targets[a++] = Target2;
-	Targets[a++] = TargetBot;
+	errmode(0);
 	
-	while(true) {
-		item = radar(Targets);
-		if(item == null) break;
-		if(item.category == Target2) {
-			if(widocznosc(item.position, 5)) {
-				if(item.position.z > this.position.z) {
-					engine = 1.0;
-				}
-				if(item.position.z < this.position.z) {
-					engine = -1.0;
-				}
-				if(inRangeMinus(item.position, 5)) {
-					engine = 0.5;
-				}
-				if(inRangePlus(item.position, 5)) {
-					engine = -0.5;
-				}
-				if(inRangeMinus(item.position, 2.5)) {
-					engine = 0.25;
-				}
-				if(inRangePlus(item.position, 2.5)) {
-					engine = -0.25;
-				}
-				if(inRange(item.position, 1)) {
-					engine = 0;
-					message("Me:"+this.position.z+" Target:"+item.position.z+" Dist: "+distance2d(this.position, item.position), DisplayInfo);
-				} else message("Me:"+this.position.z+" Target:"+item.position.z+" Dist: "+distance2d(this.position, item.position));
-			} else {
-				engine = 1; //Jak cel zasloniety to do gory! :D
+	while(true)
+	{
+		CheckSelfStatus();
+		
+		item = radar(AlienAnt,0,360,15,700);
+		if(item == null)
+		{
+			item = radar(AlienAnt);
+			if(item == null)
+			{
+				CheckSelfStatus();
+				message("No enemies found, sleeping for awhile...");
+				item = radar(SpaceShip);
+				goto(item.position);
+				move(-3.0); // move back a bit so we aren't so close to the ship's pole.
+				wait(60);
+				continue;
 			}
-			if(!inDirectionRange(item.position, 1)) {
-				message("Me:"+this.position.z+" Target:"+item.position.z+" Dist: "+distance2d(this.position, item.position), DisplayWarning);
-				turn(direction(item.position));
-			}
-			if(inRange(item.position, 1)) {
-				motor(1,1);
-			} else {
-				if(distance2d(this.position, item.position) > 10) {
-					motor(1,1);
-				} else {
-					motor(0.5,0.5);
-				}
-			}
-			jet(engine);
-			if(this.temperature > 1-((this.position.z-topo(this.position))*0.006)) {
-				message("Me:"+this.position.z+" Target:"+item.position.z+" Dist: "+distance2d(this.position, item.position), DisplayError);
-				jet(-1);
-				while( this.temperature > 0 );
-			}
-		} else {
+		}
+		
+		// Get a location that is 35 units in front of us.
+		loc.x = (cos(orientation) * 35.0) + position.x;
+		loc.y = (sin(orientation) * 35.0) + position.y;
+		loc.z = position.z + 5.0;
+		ground = topo(loc); // Get the ground height at this location.
+		
+		// Now try to maintain a height of about 15 units above the ground.
+		if((ground + 15.0) > position.z)
+		{
+			jet(0.4);
+		}
+		else if(((ground + 15.0) < position.z) && (altitude > 5.0))
+		{
+			jet(-0.7);
+		}
+		else
+		{
 			jet(0);
-			motor(0,0);
-			
-			do {
-				cel = item.position;
-				
-				turn(direction(cel));
-				
-				if(distance(cel, this.position) > 30) move(distance(cel, this.position)-30);
+		}
+		motor(1, 1); // Start moving at full throttle.
+		wait(0.5); // Wait a little so we don't constantly turn to face enemy.
 
-				if(!widocznosc(cel, 2)) {
-					jet(1);
-					while(!widocznosc(cel, 2));
-				}
-				
-				do {
-					H = cel.z - this.position.z; 
-					L = distance2d(cel, this.position); 
-					alfa = atan(H/L);
-					if(alfa < -20) jet(-0.25);
-					if(alfa > 20) jet(0.25);
-				} while(alfa < -20 || alfa > 20);
-				aim(alfa);
-				
-				turn(direction(cel));
-
-				fire(0.1);
-				
-				if(this.temperature > 1-((this.position.z-topo(this.position))*0.006)) {
-					message("Me:"+this.position.z+" Target:"+item.position.z+" Dist: "+distance2d(this.position, item.position), DisplayError);
-					jet(-1);
-					while( this.temperature > 0 );
-				}
-			} while(item != null);
+		// Make sure we are at least 20 units away before turning.
+		if(distance2d(position, item.position) > 20.0)
+		{
+			turn(direction(item.position));
+			z_diff = position.z - item.position.z;
+			if(z_diff > 5.0)
+			{
+				// Our Z differences are too great, so go down.
+				jet(-1);
+			}
+			if(distance2d(position, item.position) < 50.0)
+			{
+				turn(direction(item.position));
+				fire_angle = -20.0; // Angle down as far as we can.
+				aim(fire_angle);
+				fire(0.1); // Fire short bursts (saves energy, but still kills).
+			}
 		}
 	}
-	message("FINISHED", DisplayWarning);
-	message("FINISHED", DisplayWarning);
-	message("FINISHED", DisplayWarning);
-	message("FINISHED", DisplayWarning);
-	jet(0);
-	motor(0,0);
-	item = radar(SpaceShip);
-	wait(1);
-	goto(item.position);
-	
 }
+
+
+void object::CheckSelfStatus()
+{
+	object item;
+	
+	if(energyCell.energyLevel < 0.55)
+	{
+		Recharge2(0); // Recharge, but don't go back to previous position.
+		if(shieldLevel < 1) // Might as well repair while we are back at base.
+		{
+			item = radar(RepairCenter);
+			goto(item.position);
+			wait(6);
+		}
+	}
+	if(temperature > 0.70)
+	{
+		GotoSafeLZ();
+	}
+	if(shieldLevel < 0.70)
+	{
+		item = radar(RepairCenter);
+		goto(item.position);
+		while ( shieldLevel < 1 )
+		{
+			wait(1);            // waits until fully repaired.
+		}
+		
+		if(energyCell.energyLevel < 0.85) // Recharge while we are at base.
+		{
+			Recharge2(0); // Recharge, but don't go back to previous position.
+		}
+	}
+}
+
+void object::GotoSafeLZ()
+{
+	object item;
+	float EnemyDist = 10000.0;
+	point loc;
+	
+	item = radar(AlienAnt);
+	if(item != null)
+	{
+		EnemyDist = distance2d(position, item.position);
+	}
+	if(EnemyDist > 50.0)
+	{
+		message("Need rest, no enemies close.");
+	}
+	else
+	{
+		message("Enemies close, moving away to rest.");
+		//turn((direction(item.position) + 180.0)); // Turn away from nearest enemy.
+		// Move 50 feet away from enemy.
+		loc.x = (cos(orientation) * 50.0) + item.position.x;
+		loc.y = (sin(orientation) * 50.0) + item.position.y;
+		loc.z = position.z + 5.0;
+		goto(loc); // use goto so it will intelligently find a path if necessary.
+	}
+	
+	if(topo(position) < 0)
+	{
+		// There is deep water below me, I can't land here or I'll die, so try to find some
+		// dry land close by.
+		int counter = 0;
+		
+		message("Can't land in water, looking for safe place to set down...");
+		while(counter < 36)
+		{
+			loc.x = (cos(orientation) * 20.0) + position.x;
+			loc.y = (sin(orientation) * 20.0) + position.y;
+			loc.z = position.z + 5.0;
+			if(topo(position) >= 0)
+			{
+				// Found some land, so go there to land.
+				message("Found some land, moving there.");
+				move(20.0);
+				break;
+			}
+			turn(10);
+			counter++;
+		}
+		
+	}
+	
+	LandAndRest();
+}
+
+void object::LandAndRest()
+{
+	message("Landing and resting.");
+	while(temperature > 0)
+	{
+		if(altitude > 0)
+		{
+			jet(-1);
+		}
+		wait(0.5);
+	}
+	message("Done resting, let me at 'em!");
+}
+
+void object::Recharge2(int ReturnToPrevious)
+{
+	point  start;          // variable for initial pos.
+	object item;           // info. about power station
+	
+	message("Heading in for recharging...");
+	start = position;      // stores initial position
+	
+	item = radar(PowerStation); // looks for station
+	goto(item.position);   // goes to the power station
+	
+	while ( energyCell.energyLevel < 1 )
+	{
+		wait(1);            // waits until recharged
+	}
+	
+	if(ReturnToPrevious >= 1)
+	{
+		goto(start);           // comes back to initial pos.
+	}
+	message("Recharge completed.");
+}
+

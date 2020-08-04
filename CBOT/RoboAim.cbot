@@ -4,13 +4,16 @@
 // a bot is manually piloted, but has precision aiming. Just run
 // this script instead of hitting the fire button and the bot
 // will aim and fire once at the closest alien in front of it.
-// 
-// Now rewritten to include both pitch and roll correction
-// Reports warnings for temperature, shield and energy levels
-// in percentages.
+//		Dan Newman (daniel_newman@email.com)
+//
+// The following changes have been made:
+//	Entire category list fed into radar function
+//	Scan area limited to forward quadrant
+//	Adjusts for pitch gives better accuracy on non-winged bots
+//	Provides warnings for overtemp, shield and energy level
 
 
-extern void object::RoboAim2()
+extern void object::RoboAim()
 {
 	object alien;
 	float angle;
@@ -24,18 +27,14 @@ extern void object::RoboAim2()
 	alienList[nr++] = AlienWorm;
 	alienList[nr++] = AlienEgg;
 	
-	alien = radar(alienList,0,90,0,45);
+	alien = radar(alienList,0,90,0,40);	//scan the forward quandrant
 	if(alien != null)        //if there still is a alien left
 	{
-		if(distance(position, alien.position) < 45)
+		if(distance(position, alien.position) < 35)
 		{
-			turn(direction(alien.position));    //coarse turn adjustment;
+			turn(direction(alien.position));
 			
-			angle = atan(((topo(alien.position)+alien.altitude)-(topo(position)+altitude))/distance2d(position, alien.position));        //determine absolute aiming angle
-			
-			// calulate and turn to adjust for roll angle
-			if(roll < 0) turn((angle-pitch)*cos(roll)*cos(90-roll));
-			else turn(-((angle-pitch)*cos(roll)*cos(90-roll)));
+			angle = atan(((topo(alien.position)+alien.altitude)-(topo(position)+altitude))/distance2d(position, alien.position));
 			
 			aim(angle-pitch);    //aim at the target
 			
@@ -43,9 +42,8 @@ extern void object::RoboAim2()
 		}
 	}
 	else message("No target");
-	
-	if(temperature > 0.8) message("Engines at " + (temperature * 100) + "%");
-	if(shieldLevel < 0.2) message("Warning-Shield at " + (shieldLevel * 100) + "%");
-	if(energyCell.energyLevel < 0.2) message("Warning-Energy at " + (energyCell.energyLevel * 100) + "%");
+	if(temperature > 0.8) message("Engines getting hot");
+	if(shieldLevel < 0.2) message("Warning-Shield status critical!");
+	if(energyCell.energyLevel < 0.2) message("Warning-Energy level low!");
 }
 

@@ -1,3 +1,5 @@
+/This program is used to destroy wasps, spiders and ants by a program. This program is a compilation and improvement of the exercise programs. It also includes temperature, battery and shield control. The program determines what kind of enemies there are, then determines the closest one. It can be used in all missions where there are enemies. Messages are in French/
+
 extern void object::Tueur()
 {
 	object guèpe,fourmi,araignée;

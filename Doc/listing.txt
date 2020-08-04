@@ -1,0 +1,307 @@
+num - [Tallest Point][Radi-Clearance] Name 
+ie.
+### - [Heigh][Radi-] Name
+502 - [02.00][02.25] Alien Ant
+
+
+If you use the tallest point and radi-clearance numbers i suggest 
+that you add a few meters to them, these are the absolute 
+minimum(of the maximum) clearances to the next 1/4 of a 
+meter. I used a Winged Flyer to get these measurements so if your
+using a shilder(or other large bot) you may have to add an 
+additional 1 or 2 meters. Also if the object is larger in the 
+air than on the ground, the  air measurement is taken at the 
+widest part.
+
+How do you use this information, just like you would use the name
+of an object i.e.
+
+Radar(5,0,360,0,800); 
+// is the same as:
+Radar(BotFactory,0,360,0,800);
+// this means you now have a list of EVRYTHING detectable by the Radar
+// And all the clearance stats you need to avoid them :P
+
+
+
+0   - [--.--][--.--] <-- This is your new best friend!
+
+Using 0 in a radar command will return the closest(or farthest depending 
+what you have your radar command set for) ITEM OF ANY CATEGORY!
+
+The following example isn�t very practical(and my not even work), it's 
+just a little something to get your mind going.
+
+You could use this and simply check for lets say any Alien like this:
+/---------------------------------------------------------------\
+|object Item;							|
+|Item = radar(0,0,360,0,45);					|
+|//501 to 505 is Aliens						|
+|if((abs(Item.category)>=501)&&(abs(Item.category)<=505))	|
+|{								|
+|	//Aim the cannon					|
+|	fire(0.25);	//Kill it				|
+|}								|
+\---------------------------------------------------------------/
+Now I don�t know how practical of an implementation this is but
+you get the idea of some uses, i would say that the use of this
+"0" would be better suited for avoiding objects rather than trying to 
+kill something, because if a bush or tree is closer than the Ant
+its going to detect the bush or tree instead. Now I�m sure with 
+some thought you can come up with a way to avoid this problem
+but hey i have to leave you something to think about :P
+
+i use "abs(Item.category)" to return the numeric category value
+if you just used "Item.category" it would return the name of the object
+if it has one, and frankly the Name of the object may work, i 
+believe that Colobot sees the name as a numeric value. I just haven�t 
+bothered to test that yet.
+
+============================ Full Listing ============================
+### - [Heigh][Radi-] Name; Levels found on and/or more definitions.
+======================================================================
+0   - [--.--][--.--] Wild Card, it is anything and everything!
+
+2   - [19.50][32.25] Gantry Crane
+3   - [22.50][20.00] Space Ship; Top Width of 8.25 
+4   - [08.00][03.00] Derrick
+5   - [06.50][06.00] Bot Factory
+6   - [03.50][06.00] Power Station
+7   - [04.00][05.00] Ore Converter
+8   - [05.00][05.25] Repair Center
+9   - [07.75][02.75] Defense Tower
+10  - [00.00][00.00] Alien Nest; Organic Material/hatchery?, however it is probably holding Orga mater
+11  - [05.75][03.75] Research Center
+12  - [04.75][02.75] Radar Station
+13  - [05.25][04.00] Power Plant; Power Cell Factory
+14  - [04.25][05.25] Auto Lab
+15  - [10.25][07.00] Nuclear Power Station
+16  - [00.00][00.00] Start Area; platform
+17  - [00.00][00.00] Goal Area;  platform
+18  - [04.75][02.75] Information exchange post
+19  - [17.25][06.50] Power Captor
+20  - [25.25][07.75] Target "the target stand" (+)==<  looking thing; 03.25 at bace
+21  - [00.00][00.00] Target2 "the actual Brass + Target"
+22  - [03.75][04.50] Vault
+23  - [06.25][18.75] Huston Mission Control
+
+31  - [01.00][01.50] Titanium Ore
+32  - [01.00][01.50] Uranium Ore
+33  - [01.00][01.50] Titanium
+34  - [01.00][01.50] Power Cell
+35  - [01.00][01.50] Nuclear Power Cell
+36  - [01.00][01.50] Orga Mater
+37  - [01.00][01.50] Black Box
+38  - [01.00][01.50] TNT Brick
+
+50  - [00.00][00.00] green cross   -> energy deposit.
+51  - [00.00][00.00] red cross     -> titanium ore.
+52  - [00.00][00.00] yellow circle -> uranium ore.
+
+### - [Heigh][Radi-] Name
+
+60  - [01.25][02.00] Mine
+61  - [01.00][01.75] Firework
+63  - [01.00][02.00] Rocket Back Pack
+
+70  - [01.25][01.75] Plant; Earth, Tropica, Centaury
+71  - [01.25][01.75] Plant; Earth, Tropica, Centaury
+72  - [01.25][01.75] Plant; Earth, Tropica, Centaury
+73  - [01.25][01.75] Plant; Earth, Tropica, Centaury
+74  - [01.25][01.75] Plant; Earth, Tropica, Centaury
+75  - [00.00][00.00] Small Plant; Tropica
+76  - [00.00][00.00] Small Plant; Tropica
+77  - [00.00][00.00] Small Plant; Tropica
+80  - [05.25][02.75] Large Plant; Tropica
+81  - [04.75][02.50] Large Plant; Tropica
+82  - [05.25][02.50] Large Plant; Tropica
+83  - [05.25][03.00] Large Plant; Tropica
+84  - [04.25][02.50] Large Plant; Tropica
+85  - [01.25][01.75] Plant; Volcano
+86  - [01.25][01.75] Plant; Volcano
+87  - [01.25][01.75] Plant, Tall; Volcano
+88  - [01.25][01.75] Plant; Volcano
+89  - [01.25][01.75] Plant; Volcano
+90  - [07.75][01.75] Tree; Earth
+91  - [10.00][02.50] Tree; Earth
+92  - [09.50][02.75] Tree; Earth
+93  - [08.25][03.75] Tree; Earth
+
+### - [Heigh][Radi-] Name
+
+100 - [02.25][02.50] Practice Bot
+
+110 - [02.50][02.50] Wheeled Grabber
+111 - [02.50][02.50] Tracked Grabber
+112 - [02.50][02.50] Winged Grabber
+113 - [02.50][02.50] Legged Grabber
+
+120 - [02.50][02.50] Wheeled Shooter
+121 - [02.50][02.50] Tracked Shooter
+122 - [02.50][02.50] Winged Shooter
+123 - [02.50][02.50] Legged Shooter
+
+130 - [02.50][02.50] Wheeled Orga Shooter
+131 - [02.50][02.50] Tracked Orga Shooter
+132 - [02.50][02.50] Winged Orga Shooter
+133 - [02.50][02.50] Legged Orga Shooter
+
+140 - [02.50][02.50] Wheeled Sniffer
+141 - [02.50][02.50] Tracked Sniffer
+142 - [02.50][02.50] Winged Sniffer
+143 - [02.50][02.50] Legged Sniffer
+
+200 - [03.00][03.00] Thumper
+201 - [03.25][03.00] Phazer Shooter35
+202 - [03.50][03.00] Recycler
+203 - [04.50][03.00] Shielder; Height 3.00 when not active
+210 - [02.50][02.50] Subber
+211 - [02.25][02.50] Target Bot
+250 - [00.00][00.00] Way Point
+
+### - [Heigh][Radi-] Name
+
+260 - [00.00][00.00] Blue Flag
+261 - [00.00][00.00] Red Flag
+262 - [00.00][00.00] Green Flag
+263 - [00.00][00.00] Yellow Flag
+264 - [00.00][00.00] Purple Flag
+270 - [01.00][01.50] KeyA - Blue
+271 - [01.00][01.50] KeyB - Red
+272 - [01.00][01.50] KeyC - Green
+273 - [01.00][01.50] KeyD - Yellow
+
+300 - [02.00][01.75] Me
+302 - [02.00][01.75] Tech (looks a lot like "Me" in some levels)
+400 - [01.50][02.25] Barrier-Short; 1.5 width (about radi-of bot)
+401 - [01.50][03.50] Barrier-Long; 1.5 width (about radi-of bot)
+
+500 - [07.25][06.25] Alien Queen
+501 - [02.00][02.25] Alien Egg
+502 - [02.00][02.25] Alien Ant
+503 - [01.25][02.00] Alien Spider
+504 - [02.25][02.25] Alien Wasp
+505 - [00.00][00.00] Alien Worm
+
+600 - [02.50][03.00] A Wreckage wild card! for Recyclables
+/* All Wreckage's are all 600, the 60_ is the .category
+600 - [01.75][02.00] Wreckage; Whelled Grabber, Recyclable
+601 - [01.50][02.00] Wreckage; Sunken Whelled Grabber, Recyclable
+602 - [02.00][03.00] Wreckage; Tracked Shooter, Recyclable
+603 - [02.00][03.00] Wreckage; Sunken Tracked Shooter, Recyclable
+603 - [02.25][02.50] Wreckage; Sunken Recyceler, Recyclable
+605 - [02.50][02.50] Wreckage; Recyceler, Recyclable
+*/
+606 - [04.00][06.00] Ruin; Bot Factory
+607 - [01.50][02.25] Ruin; Ore Converter Door
+608 - [01.25][02.00] Ruin; Support, C shaped hunk of mettel
+609 - [01.50][02.25] Ruin; Brick like, Radar Station Base
+610 - [01.25][05.00] Ruin; Ore Converter
+611 - [08.75][13.25] Ruin; Space Ship Bace
+612 - [09.50][08.50] Ruin; Space Ship Top
+
+700 - [02.00][02.00] Crystal; Crystalium
+701 - [02.50][02.50] Crystal; Crystalium
+702 - [03.50][02.75] Crystal; Crystalium
+703 - [06.00][04.50] Crystal; Crystalium
+
+710 - [06.00][04.25] Green Mega Stalk; Stranve Plant, Small
+711 - [07.50][03.50] Green Mega Stalk; Stranve Plant, Small
+712 - [06.25][03.25] Green Mega Stalk; Stranve Plant, Small
+713 - [08.75][05.25] Green Mega Stalk; Stranve Plant, Med
+714 - [12.50][07.25] Green Mega Stalk; Stranve Plant, Large
+715 - [12.50][07.25] Green Mega Stalk; Stranve Plant, Large with Green Shield like apperatice
+715 - [--.--][22.00] #715's Green Shield (affects flyers ability to fly); you cannot fly over it
+
+731 - [02.50][02.00] Mushroom; non corrosive
+732 - [02.50][02.00] Mushroom; corrosive
+
+900 - [04.00][05.02] Lunar Lander; Derelict of Apollo Mission
+901 - [02.05][03.25] Lunar Roving Vehicle
+902 - [00.00][00.00] American flag; Derelict of Apollo Mission
+903 - [01.75][01.75] Inverted Satelite Dish; Derelict of Apollo Mission
+904 - [02.75][02.00] Satelite Dish; Derelict of Apollo Mission
+910 - [04.50][03.75] Home
+ 
+### - [Heigh][Radi-] Name
+
+-If you have any additions to this list please let me know at 
+	RossK_WC2@hotmail.com
+	Aim: Ens1747
+	ICQ: 1747522
+
+===================================================================================
+And incase if your wondering how i extracted this data, here you go:
+-----------------------------------------------------------------------------------
+//Outputs all objects on the map to a file
+//Note: Wrecks are all 600 no mater what .category
+extern void object::FindNewItems() // This prossess takes some time
+{
+	file filSearch();
+	object Named;
+
+	//File is output to "...\Colobot\files\Search.txt"
+	filSearch.open("Search.txt", "w");
+	for(int I=1; I<=1000; I++)
+	{
+		Named = radar(I);
+		if(Named!=null)
+		{
+			filSearch.writeln("" + I + " - " + Named.category);
+		}
+	}
+
+	filSearch.close();
+}
+-----------------------------------------------------------------------------------
+// just pull your bot up to an object and run this app, search for the largest 
+// result by circling the Object and probing from difrent directions
+
+extern void object::ObjectLookUp()
+{
+	object Named;
+
+	Named = radar(0,0,90,0,10);	//useing radar(0,..) for wildcard, it'll detect anything
+	if(Named != null)
+	{
+		message("Dist From (" + Named.category + ", " + abs(Named.category) + "): " + (distance2d(position, Named.position)));
+	}
+
+}
+-----------------------------------------------------------------------------------
+extern void object::ObjectLookAllUp()
+{
+	object Named;
+	float fltGole[];
+	int j=0;
+
+	for(int i=0;i<=1000;i++)
+	{
+		Named = radar(i,0,90,0,5);
+		if(Named != null)
+		{
+			fltGole[j++] = i;
+			message("Dist From (" + Named.category + ", " + abs(Named.category) + "): " + (distance2d(position, Named.position)));
+		}
+	}
+	message("All that worked: " + fltGole);
+}
+-----------------------------------------------------------------------------------
+//If you dont understand this i have nothing to say :P
+//Fly above the object so you can just move freely
+extern void object::HowHigh()	
+{
+	object Named;
+
+	Named = radar(0,0,360,0,3);	//useing radar(0,..) for wildcard, it'll detect anything
+	message("Elevation: " + (position.z-topo(Named.position)));
+}
+-----------------------------------------------------------------------------------
+//Marks closest object of type ### with a waypoint to make it easy to find.
+extern void object::MarkUnknows()
+{
+	object objWhat;
+	objWhat=radar(###);	//Put In Desired Object Number
+	produce(objWhat.position, 0, WayPoint, "");
+}
+

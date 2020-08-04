@@ -1,0 +1,11 @@
+//all speed of units - metres per secound
+All Winged units while flying - 7 
+why moving on ground - 4.2
+
+All whelled units - 5
+All tracked units - 4.2
+All legged units - 3.8
+Subber - 3.8
+Thumber, Recycler, Shielder - 2,5
+The best unit - 2,5 (i didn't check it)
+

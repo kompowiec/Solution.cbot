@@ -1,0 +1,27 @@
+extern void object::FlyingDrill()
+{
+	object rdr;
+	object last;
+	
+	while(true)
+	{
+		rdr = radar(Target2,0,180,1,100);
+		if(rdr == null)
+		{
+			rdr = radar(SpaceShip,0,180,1,100);
+			turn(direction(rdr.position));
+			move(distance(position, rdr.position));
+			break;
+		}
+		if(rdr.position.z > position.z) jet(0.3);
+		if(rdr.position.z < position.z) jet(-0.3);
+		if(direction(rdr.position) > 2) motor(0.5,1);
+		if(direction(rdr.position) < 2) motor(1,0.5);
+		if(abs(direction(rdr.position)) <= 2) motor(1,1);
+		if(temperature > 0.9) //Should not need this part
+		{
+			motor(0,0);
+			while(temperature > 0) wait(1);
+		}
+	}
+}

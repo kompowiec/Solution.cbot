@@ -1,0 +1,68 @@
+extern void object::cats()
+{
+//This class defines the other categories that you can search 
+//for using "search" or "radar".  So to use these, just create
+//a new class instance and use the desired member in the function.
+//There's an example below:
+
+	object item;
+
+	otherCategories otherCats();		//Create the new
+						//   class instance
+	item = radar(otherCats.Mushroom1); 	//Search for the
+						//   nearest mushroom	
+}
+
+public class otherCategories
+{
+	static int Firework = 61;
+	static int Bag = 63;
+	static int Greenery0 = 70;
+	static int Greenery1 = 71;
+	static int Greenery2 = 72;
+	static int Greenery3 = 73;
+	static int Greenery4 = 74;
+	static int Greenery5 = 75;
+	static int Greenery6 = 76;
+	static int Greenery7 = 77;
+	static int Greenery10 = 80;
+	static int Greenery11 = 81;
+	static int Greenery12 = 82;
+	static int Greenery13 = 83;
+	static int Greenery14 = 84;
+	static int Greenery15 = 85;
+	static int Greenery16 = 86;
+	static int Greenery17 = 87;
+	static int Greenery18 = 88;
+	static int Greenery19 = 89;
+	static int Tree0 = 90;
+	static int Tree1 = 91;
+	static int Tree2 = 92;
+	static int Tree3 = 93;
+	static int RuinBotFactory = 606;
+	static int RuinDoor = 607;
+	static int RuinSupport = 608;
+	static int RuinRadar = 609;
+	static int RuinConvert = 610;
+	static int RuinBaseCamp = 611;
+	static int RuinHeadCamp = 612;
+	static int Quartz0 = 700;
+	static int Quartz1 = 701;
+	static int Quartz2 = 702;
+	static int Quartz3 = 703;
+	static int Mushroom1 = 731;
+	static int Mushroom2 = 732;
+	static int MegaStalk0 = 710;
+	static int MegaStalk1 = 711;
+	static int MegaStalk2 = 712;
+	static int MegaStalk3 = 713;
+	static int MegaStalk4 = 714;
+	static int MegaStalk5 = 715;
+	static int ApolloLEM = 900;
+	static int ApolloJeep = 901;
+	static int ApolloFlag = 902;
+	static int ApolloModule = 903;
+	static int ApolloAntenna = 904;
+	static int Home = 910;
+}
+
