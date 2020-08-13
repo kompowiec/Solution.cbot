@@ -59,7 +59,7 @@ extern void object::Tropica3()
 	{
 		//4) Build a radar station in order to see the location of the ants on the mini-map, and let the hunt begin. Be careful not to run out of energy and not to overheat the reactor of a bot while over water. If a bot falls into deep water, it explodes.
 		file handle();
-		handle.open("CBOT/KillAnts.cbot"); //clone this repo to files/
+		handle.open("KillAnts.cbot.txt"); //clone this repo to files/
 		handle.close();
 		
 		message(category + ": Mission complete.");
