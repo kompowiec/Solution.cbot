@@ -1,204 +1,35 @@
-// This is a rough stab (my first) at a WingedShooter program, and it seems to work fairly well on
-// the last mission of the demo (ants on the hill one).  If you improve on it, or have any
-// comments, send me an email, and please include your improved version if you have one:
-// sclover@abac.com
-
-extern void object::FlyingShooter()
+extern void object::FlyNShoot()
 {
-	object item = null;
-	point loc;
-	float fire_angle;
-	float ground;
-	float z_diff;
+	object  bot,target,Ship;
+	point   b,ship,t,t2;
+	boolean dofire=false;
+	float   flyheight=0;
 	
-	errmode(0);
+	Ship=radar(SpaceShip); ship=Ship.position;
 	
-	while(true)
+	do
 	{
-		CheckSelfStatus();
-		
-		item = radar(AlienAnt,0,360,15,700);
-		if(item == null)
+		target=radar(Target2,0,360,7.25);
+		if(target == null)target=Ship;
+		bot=radar(TargetBot,0,180);
+		if(bot!=null)b=bot.position;else b=ship;
+		t2=target.position;
+		if(distance(position,t2)<distance(position,b))
 		{
-			item = radar(AlienAnt);
-			if(item == null)
-			{
-				CheckSelfStatus();
-				message("No enemies found, sleeping for awhile...");
-				item = radar(SpaceShip);
-				goto(item.position);
-				move(-3.0); // move back a bit so we aren't so close to the ship's pole.
-				wait(60);
-				continue;
-			}
-		}
-		
-		// Get a location that is 35 units in front of us.
-		loc.x = (cos(orientation) * 35.0) + position.x;
-		loc.y = (sin(orientation) * 35.0) + position.y;
-		loc.z = position.z + 5.0;
-		ground = topo(loc); // Get the ground height at this location.
-		
-		// Now try to maintain a height of about 15 units above the ground.
-		if((ground + 15.0) > position.z)
+			t=t2;flyheight=0.8;dofire=false;
+		}  
+		else 
 		{
-			jet(0.4);
+			t=b;flyheight=9.5;if(t!=ship)dofire=true;
 		}
-		else if(((ground + 15.0) < position.z) && (altitude > 5.0))
+		if(t==ship)flyheight=1.25;
+		if(t==ship&&distance(position,t)<=10) 
 		{
-			jet(-0.7);
+			aim(0);jet(0);motor(0,0);break;
 		}
-		else
-		{
-			jet(0);
-		}
-		motor(1, 1); // Start moving at full throttle.
-		wait(0.5); // Wait a little so we don't constantly turn to face enemy.
-
-		// Make sure we are at least 20 units away before turning.
-		if(distance2d(position, item.position) > 20.0)
-		{
-			turn(direction(item.position));
-			z_diff = position.z - item.position.z;
-			if(z_diff > 5.0)
-			{
-				// Our Z differences are too great, so go down.
-				jet(-1);
-			}
-			if(distance2d(position, item.position) < 50.0)
-			{
-				turn(direction(item.position));
-				fire_angle = -20.0; // Angle down as far as we can.
-				aim(fire_angle);
-				fire(0.1); // Fire short bursts (saves energy, but still kills).
-			}
-		}
-	}
+		jet((t.z-position.z+flyheight)/20); 
+		motor(1-(direction(t)/90),1+(direction(t)/90));
+		aim(asin((b.z-position.z)/distance(position,b)));
+		if((dofire)&&distance(position,t)<=30)fire(0.1);
+	}while(target!=null);
 }
-
-
-void object::CheckSelfStatus()
-{
-	object item;
-	
-	if(energyCell.energyLevel < 0.55)
-	{
-		Recharge2(0); // Recharge, but don't go back to previous position.
-		if(shieldLevel < 1) // Might as well repair while we are back at base.
-		{
-			item = radar(RepairCenter);
-			goto(item.position);
-			wait(6);
-		}
-	}
-	if(temperature > 0.70)
-	{
-		GotoSafeLZ();
-	}
-	if(shieldLevel < 0.70)
-	{
-		item = radar(RepairCenter);
-		goto(item.position);
-		while ( shieldLevel < 1 )
-		{
-			wait(1);            // waits until fully repaired.
-		}
-		
-		if(energyCell.energyLevel < 0.85) // Recharge while we are at base.
-		{
-			Recharge2(0); // Recharge, but don't go back to previous position.
-		}
-	}
-}
-
-void object::GotoSafeLZ()
-{
-	object item;
-	float EnemyDist = 10000.0;
-	point loc;
-	
-	item = radar(AlienAnt);
-	if(item != null)
-	{
-		EnemyDist = distance2d(position, item.position);
-	}
-	if(EnemyDist > 50.0)
-	{
-		message("Need rest, no enemies close.");
-	}
-	else
-	{
-		message("Enemies close, moving away to rest.");
-		//turn((direction(item.position) + 180.0)); // Turn away from nearest enemy.
-		// Move 50 feet away from enemy.
-		loc.x = (cos(orientation) * 50.0) + item.position.x;
-		loc.y = (sin(orientation) * 50.0) + item.position.y;
-		loc.z = position.z + 5.0;
-		goto(loc); // use goto so it will intelligently find a path if necessary.
-	}
-	
-	if(topo(position) < 0)
-	{
-		// There is deep water below me, I can't land here or I'll die, so try to find some
-		// dry land close by.
-		int counter = 0;
-		
-		message("Can't land in water, looking for safe place to set down...");
-		while(counter < 36)
-		{
-			loc.x = (cos(orientation) * 20.0) + position.x;
-			loc.y = (sin(orientation) * 20.0) + position.y;
-			loc.z = position.z + 5.0;
-			if(topo(position) >= 0)
-			{
-				// Found some land, so go there to land.
-				message("Found some land, moving there.");
-				move(20.0);
-				break;
-			}
-			turn(10);
-			counter++;
-		}
-		
-	}
-	
-	LandAndRest();
-}
-
-void object::LandAndRest()
-{
-	message("Landing and resting.");
-	while(temperature > 0)
-	{
-		if(altitude > 0)
-		{
-			jet(-1);
-		}
-		wait(0.5);
-	}
-	message("Done resting, let me at 'em!");
-}
-
-void object::Recharge2(int ReturnToPrevious)
-{
-	point  start;          // variable for initial pos.
-	object item;           // info. about power station
-	
-	message("Heading in for recharging...");
-	start = position;      // stores initial position
-	
-	item = radar(PowerStation); // looks for station
-	goto(item.position);   // goes to the power station
-	
-	while ( energyCell.energyLevel < 1 )
-	{
-		wait(1);            // waits until recharged
-	}
-	
-	if(ReturnToPrevious >= 1)
-	{
-		goto(start);           // comes back to initial pos.
-	}
-	message("Recharge completed.");
-}
-
