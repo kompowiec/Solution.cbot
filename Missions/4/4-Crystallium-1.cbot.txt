@@ -1,11 +1,13 @@
 extern void object::Crystalium1()
 {
+	
 	object item;
 	int errcode;
 	errmode(0);
 	
 	if(category ==WheeledGrabber)
 	{
+		
 		for(int i = 0; i < 5; i++)
 		{
 			//2) Build a converter near the chunks of titanium ore. You'll find them in the vicinity of the spaceship to the east.
@@ -52,7 +54,7 @@ extern void object::Crystalium1()
 		while(item == null) item = radar(BotFactory);
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);
-		drop();
+		  drop();
 		//2) Produce a winged grab
 		item = radar(PowerCell); 
 		errcode = goto(item.position);
@@ -78,29 +80,32 @@ extern void object::Crystalium1()
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);
 		drop();
+		
+		item = radar(SpaceShip);
+		goto(item.position);
 	}
 	else if(category == WingedShooter)
 	{
-	//3) Carry a titanium cube to the highest point. TODO
-	//7) Build the defense tower next to the radar.
-	  item = radar(PowerCell);
-	  goto(item.position);
-	  grab();
-	//4) Build a radar on the spot.
+		//3) Carry a titanium cube to the highest point. TODO
+		//7) Build the defense tower next to the radar.
+		  item = radar(PowerCell);
+		  goto(item.position);
+		  grab();
+		//4) Build a radar on the spot.
 		item = radar(RadarStation);
 		if(item == null) message("Waiting for RadarStation to be built.");
 		while(item == null) item = radar(RadarStation);
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);
 		drop();
-
+		
 		item = radar(DefenseTower);
 		if(item == null) message("Waiting for DefenseTower to be built.");
 		while(item == null) item = radar(DefenseTower);
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);
 		drop();
-	//8) When all the worms are destroyed, you can go back to your ship and take off
+		//8) When all the worms are destroyed, you can go back to your ship and take off
 		message(category + ": Mission complete.");
 	}
 }
