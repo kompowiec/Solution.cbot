@@ -35,7 +35,7 @@ extern void object::Crystalium1()
 			drop();               
 		}
 		item = radar(PowerCell);
-		goto(item.position);
+		goto(item.position); //change battery
 		grab();
 		grab(InFront);
 		drop(Behind);
@@ -84,21 +84,23 @@ extern void object::Crystalium1()
 		item = radar(SpaceShip);
 		goto(item.position);
 	}
-	else if(category == WingedShooter)
+	else if(category == WingedGrabber)
 	{
+		item = radar (Titanium);
+		goto(item.position);
+		grab();
 		//3) Carry a titanium cube to the highest point. TODO
-		//7) Build the defense tower next to the radar.
-		  item = radar(PowerCell);
-		  goto(item.position);
-		  grab();
-		//4) Build a radar on the spot.
-		item = radar(RadarStation);
-		if(item == null) message("Waiting for RadarStation to be built.");
-		while(item == null) item = radar(RadarStation);
-		errcode = goto(item.position);
-		while(errcode != 0) errcode = goto(item.position);
+		point x (3.98, 97.68);
+		goto(x);
 		drop();
 		
+		item = radar(SpaceShip);
+		goto(item.position);
+		
+		item = radar(PowerCell);
+		goto(item.position);
+		grab();
+		//7) Build the defense tower next to the radar.
 		item = radar(DefenseTower);
 		if(item == null) message("Waiting for DefenseTower to be built.");
 		while(item == null) item = radar(DefenseTower);
@@ -106,6 +108,9 @@ extern void object::Crystalium1()
 		while(errcode != 0) errcode = goto(item.position);
 		drop();
 		//8) When all the worms are destroyed, you can go back to your ship and take off
-		message(category + ": Mission complete.");
+		message(category + ": When all the worms are destroyed, Mission complete.");
+		
+		item = radar(SpaceShip);
+		goto(item.position);
 	}
 }
