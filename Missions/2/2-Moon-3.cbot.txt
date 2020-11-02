@@ -76,9 +76,6 @@ extern void object::Fly()
 		}
 	}
 	message("FINISHED", DisplayWarning);
-	message("FINISHED", DisplayWarning);
-	message("FINISHED", DisplayWarning);
-	message("FINISHED", DisplayWarning);
 	item = radar(SpaceShip);
 	wait(1);
 	goto(item.position);

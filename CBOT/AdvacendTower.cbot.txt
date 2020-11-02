@@ -1,4 +1,4 @@
-extern void object::AdvancedTowe()
+extern void object::AdvancedTower()
 {
 	errmode(0);
 	object  tower;               // info. about tower

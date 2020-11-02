@@ -57,7 +57,7 @@ extern void object::MoonOre()
 		while(errcode != 0) errcode = goto(item.position);
 		drop();
 		
-		message("Wingedgrabber ready.");
+		message("WingedGrabber ready.");
 		
 		move(-6);
 		
