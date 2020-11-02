@@ -1,0 +1,7 @@
+extern void object::win()
+{
+	
+	produce(position,0,TNT,"");
+	
+}
+
