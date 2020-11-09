@@ -1,4 +1,4 @@
-extern void object::MoonOre()
+extern void object::Moon1()
 {
 	object item;
 	int i = 0;
@@ -57,30 +57,9 @@ extern void object::MoonOre()
 		while(errcode != 0) errcode = goto(item.position);
 		drop();
 		
-		message("WingedGrabber ready.");
+		message("Wingedgrabber ready.");
 		
 		move(-6);
-		
-		if(item != null)
-		{
-			errcode = goto(item.position);
-			while(errcode != 0) errcode = goto(item.position);
-			errcode = goto(space(position));
-			while(errcode != 0) errcode = goto(space(position));
-		}
-		message("Waiting for ore to be delivered.");
-		while(i < 4)
-		{
-			i = 0;
-			item = radar(TitaniumOre,0,360,range,100);
-			while(item != null)
-			{
-				i++;
-				range = distance2d(position, item.position) + 0.01;
-				item = radar(TitaniumOre,0,360,range,100);
-			}
-			range = 0;
-		}
 		
 		item = radar(SpaceShip);
 		errcode = goto(item.position);
@@ -109,3 +88,4 @@ extern void object::MoonOre()
 	}
 	message(category + ": Mission Complete.");
 }
+

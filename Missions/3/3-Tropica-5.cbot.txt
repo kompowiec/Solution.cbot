@@ -10,14 +10,13 @@ extern void object::Tropica5()
 	{
 		for(int i = 0; i < 2; i++)
 		{
-//2) Build a converter near the chunks of titanium ore. You'll find them in the vicinity of the spaceship to the east.
-//3) Produce two cubes.
+			
 			item = radar(TitaniumOre);
 			goto(item.position);
 			grab();
 			
 			item = radar(Converter);
-			if(item == null) message("Waiting for Conveter to be bulid.");
+			if(item == null) message("Waiting for Converter to be build.");
 			item = radar(Converter);
 			if(item == null) message("Waiting to building Converter");
 			while(item == null) item = radar(Converter);
@@ -26,15 +25,20 @@ extern void object::Tropica5()
 			drop();
 			move(-2.5);
 			
-			while(item == null) item = radar(Titanium);
-			errcode = goto(item.position);
-			while(errcode != 0) errcode = goto(item.position);
-			wait(15);
+			do
+			{
+				wait(1);
+				item = radar(Titanium, 0, 45, 0, 5);
+			}
+			while ( item == null );
+			
+			goto(item.position);
 			grab();
 			
-			goto(space(position)); 
-			drop();               
+			goto(space(position));
+			drop();
 		}
+
 		item = radar(Titanium);
 		goto(item.position);
 		grab();
@@ -56,7 +60,7 @@ extern void object::Tropica5()
 		goto(item.position);
 		grab();
 
-		if(item == null) message("Waiting for Subber to be bulid.");
+		if(item == null) message("Waiting for Subber to be build.");
 		while(item == null) item = radar(Subber);
 		errcode = goto(item.position);
 		drop();

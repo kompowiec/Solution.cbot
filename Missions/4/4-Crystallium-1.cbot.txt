@@ -7,33 +7,9 @@ extern void object::Crystalium1()
 	
 	if(category ==WheeledGrabber)
 	{
+		CollectTitanium3(4);
 		
-		for(int i = 0; i < 5; i++)
-		{
-			//2) Build a converter near the chunks of titanium ore. You'll find them in the vicinity of the spaceship to the east.
-			//3) Produce two cubes.
-			item = radar(TitaniumOre);
-			goto(item.position);
-			grab();
-			
-			item = radar(Converter);
-			if(item == null) message("Waiting for Conveter to be bulid.");
-			item = radar(Converter);
-			if(item == null) message("Waiting to building Converter");
-			while(item == null) item = radar(Converter);
-			errcode = goto(item.position);
-			while(errcode != 0) errcode = goto(item.position);
-			drop();
-			move(-2.5);
-			
-			while(item == null) item = radar(Titanium);
-			errcode = goto(item.position);
-			while(errcode != 0) errcode = goto(item.position);
-			wait(15);
-			grab();
-			goto(space(position)); 
-			drop();               
-		}
+		/*
 		item = radar(PowerCell);
 		goto(item.position); //change battery
 		grab();
@@ -43,6 +19,9 @@ extern void object::Crystalium1()
 		drop(InFront);
 		grab(Behind);
 		drop(EnergyCell);
+
+		CollectTitanium3(1);
+*/ //if your battery runs out, uncomment this and change the number TitaniumOre in the function parameter to a smaller one. Works on my machine
 		
 		//1) Build a bot factory.
 		item = radar(Titanium);
@@ -112,5 +91,41 @@ extern void object::Crystalium1()
 		
 		item = radar(SpaceShip);
 		goto(item.position);
+	}
+}
+
+void object::CollectTitanium3(int ii)
+{
+	object item;
+	int errcode;
+	errmode(0);
+	       
+	for(int i = 0; i < ii; i++)
+	{
+		item = radar(TitaniumOre);
+		goto(item.position);
+		grab();
+		
+		item = radar(Converter);
+		if(item == null) message("Waiting for Conveter to be bulid.");
+		item = radar(Converter);
+		if(item == null) message("Waiting to building Converter");
+		while(item == null) item = radar(Converter);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		drop();
+		move(-2.5);
+		
+		do
+		{
+			wait(1);
+			item = radar(Titanium, 0, 45, 0, 5);
+		}
+		while ( item == null );
+		goto(item.position);
+		grab();
+		
+		goto(space(position));
+		drop();
 	}
 }

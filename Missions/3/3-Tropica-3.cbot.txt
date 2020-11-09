@@ -13,8 +13,6 @@ extern void object::Tropica3()
 		goto(item.position);
 		grab();
 		
-		//0.360.0.10
-		
 		//2) With the titanium cubes on the spaceship, build a research center and execute the <shooter cannon research program> C.
 		if(item == null) message("Waiting for Researchcenter to be built.");
 		while(item == null) item = radar(ResearchCenter);

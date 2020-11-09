@@ -1,0 +1,150 @@
+extern void object::Volcano1()
+{
+	object  item;
+	int i = 0;
+	float range = 0;
+	int errcode = 0;
+
+	if(category == TrackedGrabber)
+	{
+
+		for(int i = 0; i < 2; i++)
+		{
+
+			item = radar(TitaniumOre);
+			goto(item.position);
+			grab();
+
+			item = radar(Converter);
+			goto(item.position);
+			drop();
+			move(-2.5);
+
+			do
+			{
+				wait(1);
+				item = radar(Titanium, 0, 45, 0, 5);
+			}
+			while ( item == null );
+
+			goto(item.position);
+			grab();
+
+			goto(space(position));
+			drop();
+		}
+
+		item = radar(Titanium);
+		goto(item.position);
+		grab();
+
+		item = radar(BotFactory);
+		if(item == null) message("Waiting for Botfactory to be built.");
+		while(item == null) item = radar(BotFactory);
+		errcode = goto(item.position);
+		while(errcode != 0)
+		{
+			turn(direction(item.position));
+			move(distance2d(position, item.position));
+			errcode = goto(item.position);
+		}
+		drop();
+
+		message("Titanium loaded into BotFactory");
+
+		item = radar(PowerCell);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		grab();
+
+		item = radar(TrackedShooter);
+		if(item == null) message("Waiting for TrackedShooter to be built.");
+		while(item == null) item = radar(TrackedShooter);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		drop();
+
+		message("TrackedShooter ready.");
+
+		move(-7);
+		turn(90);
+		move(5);
+
+		item = radar(PowerCell);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		grab();
+
+		move(-7);
+
+		item = radar(PowerStation);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		if ( item != null )
+		{
+			goto(item.position);
+			while ( energyCell.energyLevel < 1 )
+			{
+				wait(1);
+			}
+		}
+
+		item = radar(ResearchCenter);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		if(item == null) message("Waiting for ResearchCenter to be built.");
+		drop();
+
+		for(int i = 0; i < 2; i++)
+		{
+			item = radar(UraniumOre);
+			goto(item.position);
+			grab();
+
+			item = radar(NuclearPlant);
+			if(item == null) message("Waiting for NuclearPlant to be built.");
+			while(item == null) item = radar(NuclearPlant);
+			errcode = goto(item.position);
+			while(errcode != 0)
+			{
+				turn(direction(item.position));
+				move(distance2d(position, item.position));
+				errcode = goto(item.position);
+			}
+			drop();
+			move(-2.5);
+
+			wait(35);
+			item = radar(NuclearCell); //Unknown Object (?) idk why i stuck here
+			goto(item.position);
+			grab();
+
+			goto(space(position));
+			drop();
+		}
+		item = radar(NuclearCell); 
+		goto(item.position);
+		grab(InFront);
+		drop(Behind);
+		grab(NuclearCell);
+		drop(InFront);
+		grab(Behind);
+		drop(NuclearCell); 
+
+		item = radar(NuclearCell);
+		grab(NuclearCell);
+		while(item == null) item = radar(TrackedShooter);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		grab(EnergyCell);
+		goto(space(position));
+		drop();
+
+		item = radar(SpaceShip);
+		goto(item.position);
+	}
+	else if(category == TrackedShooter)
+	{
+
+	}
+}
