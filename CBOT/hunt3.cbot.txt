@@ -1,13 +1,13 @@
 extern void object::hunt3()
 {
-	object enemy=radar(AlienAnt);    //pick your target
+	object enemy=radar(AlienSpider);    //pick your target
 	int x=2;                         //Flight altitude
 	int t=0;                         //To fly or not to fly
 	
 	while(true)
 	{
 		
-		enemy=radar(AlienAnt);        //looking for a victem
+		enemy=radar(AlienSpider);        //looking for a victem
 		motor(1-(direction(enemy.position)/30),1-(-direction(enemy.position)/30));    //Driving towards the victem
 		
 		// \/ \/ \/ Deciding wether or not to fly \/ \/ \/
@@ -44,7 +44,7 @@ extern void object::hunt3()
 		
 		
 		maint(); //basic maintenance
-		enemy=radar(AlienAnt);
+		enemy=radar(AlienSpider);
 	}
 	
 }

@@ -10,7 +10,7 @@ extern void object::Turret()
 		{
 			turn(direction(item.position));
 			aim(0);
-			fire(1);
+			fire(0.1);
 			
 		}
 	}
