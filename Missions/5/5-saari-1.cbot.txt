@@ -1,5 +1,8 @@
 extern void object::Saari1()
 {
+	object item;
+	int i = 0;
+	int errcode = 0;
 	//1) You'll find a titanium cube left in a smashed up bot factory. Use it to build a power station.
 	//2) The recycler is designed to convert derelicts back into usable titanium cubes.
 	if(category == Recycler)
@@ -9,7 +12,7 @@ extern void object::Saari1()
 			item = radar(Wreck);
 			goto(item.position);
 			recycle();
-
+			
 			if ( energyCell.energyLevel < 0.5 )
 			{
 				item = radar(PowerStation);
@@ -18,6 +21,7 @@ extern void object::Saari1()
 					goto(item.position);
 					while ( energyCell.energyLevel < 1 )
 					{wait(1);}
+					move(-4);
 				}
 			}
 		}
@@ -30,9 +34,9 @@ extern void object::Saari1()
 		point   b,ship,t,t2;
 		boolean dofire=false;
 		float   flyheight=0;
-
+		
 		Ship=radar(SpaceShip); ship=Ship.position;
-
+		
 		do
 		{
 			target=radar(AlienAnt,0,360,7.25);
@@ -69,39 +73,46 @@ extern void object::Saari1()
 			}
 		}while(target!=null);
 	}
-
-	else if(category == WingedGrabber)
+	
+	else if(category == WheeledGrabber)
 	{
+		{
+			item = radar(PowerStation);
+			if ( item != null )
+			{
+				goto(item.position);
+				while ( energyCell.energyLevel < 1 )
+				{wait(1);}
+			}
+		}
+		
 		//4) Recharge one of the power cells available and power a winged shooter.
 		item = radar(PowerCell);
 		goto (item.position);
 		grab();
 		item = radar(PowerStation);
 		goto (item.position); 
-
-		while ( energyCell.energyLevel < 1 )
-		{wait(1);}            // wait until recharged
-
+		
 		item = radar(WingedShooter);
 		goto (item.position);
 		drop();
-
+		
 		item = radar(SpaceShip);
 		goto (item.position);
 		/*
-			 6) Fully charge the grabber's power cell, then radio-control it to the summit...
-			 a) Access the first level by ramp on west;
-			 b) On first level travel east to find second ramp;
-			 c) On second level travel south to find third ramp;
-			 d) On third level travel west for access to summit;
-			 ...then, with the chunk, straight back to the spaceship by the most direct route so as to save the remaining power.
-			 7) Climb aboard the ship yourself and take off. */
+		 6) Fully charge the grabber's power cell, then radio-control it to the summit...
+		 a) Access the first level by ramp on west;
+		 b) On first level travel east to find second ramp;
+		 c) On second level travel south to find third ramp;
+		 d) On third level travel west for access to summit;
+		 ...then, with the chunk, straight back to the spaceship by the most direct route so as to save the remaining power.
+		 7) Climb aboard the ship yourself and take off. */
 		item = radar(AlienAnt);
 		if(item == null) message("Waiting for killing Ant by WingedShooter.");
 		while(item == null) item = radar(ResearchCenter);
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);
-
+		
 		object item;
 		point x (-107, 86.74);
 		point y (8.59, 96.00);
@@ -109,8 +120,8 @@ extern void object::Saari1()
 		point w (-38.19, 74.39);
 		point v (-24.90, 89.72);
 		point a (-21.89, 90.73);
-
-		goto(x);
+		
+		/* goto(x);
 		goto(y);
 		goto(z);
 		goto(w);
@@ -118,11 +129,11 @@ extern void object::Saari1()
 		//grab(UraniumOre); 
 		point a (-21.89, 90.73);
 		goto(a);
-		move(120);
-
+		move(120); */
+		
 		item = radar(PowerStation);
 		goto(item.position);
-
+		
 		item = radar(SpaceShip);
 		goto(item.position);
 		drop();

@@ -4,9 +4,9 @@ extern void object::FlyNShoot()
 	point   b,ship,t,t2;
 	boolean dofire=false;
 	float   flyheight=0;
-	
+
 	Ship=radar(SpaceShip); ship=Ship.position;
-	
+
 	do
 	{
 		target=radar(Target2,0,360,7.25);
@@ -15,18 +15,12 @@ extern void object::FlyNShoot()
 		if(bot!=null)b=bot.position;else b=ship;
 		t2=target.position;
 		if(distance(position,t2)<distance(position,b))
-		{
-			t=t2;flyheight=0.8;dofire=false;
-		}  
+		{	t=t2;flyheight=0.8;dofire=false;}  
 		else 
-		{
-			t=b;flyheight=9.5;if(t!=ship)dofire=true;
-		}
+		{t=b;flyheight=9.5;if(t!=ship)dofire=true;}
 		if(t==ship)flyheight=1.25;
 		if(t==ship&&distance(position,t)<=10) 
-		{
-			aim(0);jet(0);motor(0,0);break;
-		}
+		{aim(0);jet(0);motor(0,0);break;}
 		jet((t.z-position.z+flyheight)/20); 
 		motor(1-(direction(t)/90),1+(direction(t)/90));
 		aim(asin((b.z-position.z)/distance(position,b)));

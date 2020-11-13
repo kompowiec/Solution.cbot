@@ -10,13 +10,13 @@ extern void object::FlyingShooter()
 	float fire_angle;
 	float ground;
 	float z_diff;
-	
+
 	errmode(0);
-	
+
 	while(true)
 	{
 		CheckSelfStatus();
-		
+
 		item = radar(AlienAnt,0,360,15,700);
 		if(item == null)
 		{
@@ -32,26 +32,20 @@ extern void object::FlyingShooter()
 				continue;
 			}
 		}
-		
+
 		// Get a location that is 35 units in front of us.
 		loc.x = (cos(orientation) * 35.0) + position.x;
 		loc.y = (sin(orientation) * 35.0) + position.y;
 		loc.z = position.z + 5.0;
 		ground = topo(loc); // Get the ground height at this location.
-		
+
 		// Now try to maintain a height of about 15 units above the ground.
 		if((ground + 15.0) > position.z)
-		{
-			jet(0.4);
-		}
+		{jet(0.4);}
 		else if(((ground + 15.0) < position.z) && (altitude > 5.0))
-		{
-			jet(-0.7);
-		}
+		{jet(-0.7);}
 		else
-		{
-			jet(0);
-		}
+		{jet(0);}
 		motor(1, 1); // Start moving at full throttle.
 		wait(0.5); // Wait a little so we don't constantly turn to face enemy.
 
@@ -80,7 +74,7 @@ extern void object::FlyingShooter()
 void object::CheckSelfStatus()
 {
 	object item;
-	
+
 	if(energyCell.energyLevel < 0.55)
 	{
 		Recharge2(0); // Recharge, but don't go back to previous position.
@@ -103,7 +97,7 @@ void object::CheckSelfStatus()
 		{
 			wait(1);            // waits until fully repaired.
 		}
-		
+
 		if(energyCell.energyLevel < 0.85) // Recharge while we are at base.
 		{
 			Recharge2(0); // Recharge, but don't go back to previous position.
@@ -116,7 +110,7 @@ void object::GotoSafeLZ()
 	object item;
 	float EnemyDist = 10000.0;
 	point loc;
-	
+
 	item = radar(AlienAnt);
 	if(item != null)
 	{
@@ -136,13 +130,13 @@ void object::GotoSafeLZ()
 		loc.z = position.z + 5.0;
 		goto(loc); // use goto so it will intelligently find a path if necessary.
 	}
-	
+
 	if(topo(position) < 0)
 	{
 		// There is deep water below me, I can't land here or I'll die, so try to find some
 		// dry land close by.
 		int counter = 0;
-		
+
 		message("Can't land in water, looking for safe place to set down...");
 		while(counter < 36)
 		{
@@ -159,9 +153,9 @@ void object::GotoSafeLZ()
 			turn(10);
 			counter++;
 		}
-		
+
 	}
-	
+
 	LandAndRest();
 }
 
@@ -183,18 +177,18 @@ void object::Recharge2(int ReturnToPrevious)
 {
 	point  start;          // variable for initial pos.
 	object item;           // info. about power station
-	
+
 	message("Heading in for recharging...");
 	start = position;      // stores initial position
-	
+
 	item = radar(PowerStation); // looks for station
 	goto(item.position);   // goes to the power station
-	
+
 	while ( energyCell.energyLevel < 1 )
 	{
 		wait(1);            // waits until recharged
 	}
-	
+
 	if(ReturnToPrevious >= 1)
 	{
 		goto(start);           // comes back to initial pos.
