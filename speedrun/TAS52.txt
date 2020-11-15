@@ -1,0 +1,16 @@
+extern void object::TAS52()
+{
+	DEL(AlienAnt);
+	DEL(AlienEgg);
+	radar(SpaceShip).takeoff();
+}
+
+void object::DEL(int cat)
+{
+	object item;
+	while(radar(cat) != null)
+	{
+		item = radar(cat);
+		delete(item.id);
+	}
+}

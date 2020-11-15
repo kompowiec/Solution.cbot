@@ -1,0 +1,13 @@
+extern void object::Saari3()
+{
+	object item;
+	
+	item = radar(BlackBox);
+	goto(item.position);
+	grab();
+	
+	item = radar(SpaceShip);
+	goto(item.position);
+	drop();
+}
+

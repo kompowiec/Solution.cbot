@@ -1,0 +1,5 @@
+extern void object::TAS64()
+{
+	object item = radar(SpaceShip);
+	produce(item.position,0,WingedOrgaShooter);
+}

@@ -1,0 +1,89 @@
+extern void object::Moon4()
+{
+	object item;
+	int i = 0;
+	int errcode = 0;
+	
+	errmode(0);
+	
+	if(category == WheeledGrabber)
+	{
+		//1) Build a converter with the only titanium cube available.
+		//2) Deposit one chunk of titanium ore at a time at the center of the platform and let the converter do the rest.
+		CollectTitanium3(1);
+		//3) Bulid a power station with one of the newly converted titanium cubes
+		//4) If you don't feel like looking for the black box yourself, build a radar and the box will appear on your mini map somewhere north of your present location, at the bottom of a crater, next to a few derelict spacecraft and debris from the previous expedition.
+		//5)Place the grabbers at the center of the power station platform to recharge them. The cells should still have a little power left in them, just enough to radio-control the bots onto the platform.
+		item = radar(PowerStation);
+		if(item == null) message("Waiting for PowerStation to be built.");
+		while(item == null) item = radar(PowerStation);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		while ( energyCell.energyLevel < 1 )
+		{wait(1);}
+		
+		CollectTitanium3(1);
+		item = radar(SpaceShip);
+		goto(item.position);
+		
+	}
+	else if (category == WingedGrabber)
+	{
+		item = radar(PowerStation);
+		while(item == null) item = radar(PowerStation);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		while ( energyCell.energyLevel < 1 )
+		{wait(1);}
+		
+		//6)Radio-control the winged grabber to the black box and back.
+		//7) Gather both grabbers and the black box onto the spaceship platform and climb on board yourself.
+		item = radar(BlackBox);
+		goto(item.position);
+		grab();
+		
+		//8)Take off.
+		item = radar(SpaceShip);
+		goto(item.position);
+		drop();
+	}
+	message(category + ": Mission Complete.");
+}
+
+void object::CollectTitanium3(int ii)
+{
+	object item;
+	int errcode;
+	errmode(0);
+	       
+	for(int i = 0; i < ii; i++)
+	{
+		item = radar(TitaniumOre);
+		goto(item.position);
+		grab(); 
+		
+		item = radar(Converter);
+		if(item == null) message("Waiting for Conveter to be bulid.");
+		item = radar(Converter);
+		if(item == null) message("Waiting to building Converter");
+		while(item == null) item = radar(Converter);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		drop();
+		move(-2.5);
+		
+		do
+		{
+			wait(1);
+			item = radar(Titanium, 0, 45, 0, 5);
+		}
+		while ( item == null );
+		goto(item.position);
+		grab();
+		
+		goto(space(position));
+		drop();
+		
+		move(-6);
+	}
+}

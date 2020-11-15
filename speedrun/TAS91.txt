@@ -1,0 +1,7 @@
+extern void object::TAS91()
+{
+	produce(KeyA);
+	produce(Subber);
+	produce(Shielder);
+	radar(SpaceShip).takeoff();
+}

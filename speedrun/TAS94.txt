@@ -1,0 +1,10 @@
+extern void object::TAS94()
+{
+	object item = radar(AlienQueen);
+	delete(item.id);
+	while(radar(AlienAnt) != null)
+	{
+		item = radar(AlienAnt);
+		delete(item.id);
+	}
+}

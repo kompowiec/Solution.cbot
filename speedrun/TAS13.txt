@@ -1,0 +1,13 @@
+extern void object::TAS13()
+{
+	object ship = radar(SpaceShip);
+	point p = ship.position;
+	produce(p, 0, Me);
+	produce(p, 0, WheeledGrabber);
+	produce(p, 0, TrackedGrabber);
+	produce(p, 0, BlackBox);
+	object item = radar(Me);
+	delete(item.id);
+	wait(6);
+	ship.takeoff();
+} 

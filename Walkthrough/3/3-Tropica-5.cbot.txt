@@ -1,0 +1,83 @@
+extern void object::Tropica5()
+{//various
+	object item;
+	int i = 0;
+	float range = 0;
+	int errcode = 0;
+
+	if(category ==WheeledGrabber)
+	{
+		for(int i = 0; i < 2; i++)
+		{
+
+			item = radar(TitaniumOre);
+			goto(item.position);
+			grab();
+
+			item = radar(Converter);
+			if(item == null) message("Waiting for Converter to be build.");
+			item = radar(Converter);
+			if(item == null) message("Waiting to building Converter");
+			while(item == null) item = radar(Converter);
+			errcode = goto(item.position);
+			while(errcode != 0) errcode = goto(item.position);
+			drop();
+			move(-2.5);
+
+			do
+			{
+				wait(1);
+				item = radar(Titanium, 0, 45, 0, 5);
+			}
+			while ( item == null );
+
+			goto(item.position);
+			grab();
+
+			goto(space(position));
+			drop();
+		}
+
+		item = radar(Titanium);
+		goto(item.position);
+		grab();
+
+		item = radar(BotFactory);
+		if(item == null) message("Waiting for Botfactory to be built.");
+		while(item == null) item = radar(BotFactory);
+		errcode = goto(item.position);
+		while(errcode != 0)
+		{
+			turn(direction(item.position));
+			move(distance2d(position, item.position));
+			errcode = goto(item.position);
+		}
+		drop();
+		message("Titanium loaded into BotFactory");
+
+		item = radar(PowerCell);
+		goto(item.position);
+		grab();
+
+		if(item == null) message("Waiting for Subber to be build.");
+		while(item == null) item = radar(Subber);
+		errcode = goto(item.position);
+		drop();
+
+		item = radar(SpaceShip);
+		goto(item.position);
+	}
+	else if(category ==Subber)
+	{
+		move(-6);
+
+		item = radar(BlackBox);
+		goto(item.position);
+		grab();
+
+		item = radar(SpaceShip);
+		goto(item.position);
+		drop();
+	}
+	message(category + ": Mission Complete.");
+}

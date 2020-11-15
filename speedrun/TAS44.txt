@@ -1,0 +1,5 @@
+extern void object::TAS44()
+{
+	produce(BlackBox);
+	radar(SpaceShip).takeoff();
+}

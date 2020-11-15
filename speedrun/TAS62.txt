@@ -1,0 +1,5 @@
+extern void object::TAS62()
+{
+	produce(LeggedGrabber);
+	radar(SpaceShip).takeoff();
+}

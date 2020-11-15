@@ -1,0 +1,11 @@
+extern void object::TAS51()
+{
+	object ship = radar(SpaceShip);
+	point p = ship.position;
+	produce(p, 0, Me);
+	produce(p, 0, UraniumOre);
+	object item = radar(Me);
+	delete(item.id);
+	wait(6);
+	ship.takeoff();
+} 

@@ -1,0 +1,12 @@
+extern void object::TAS42()
+{
+	errmode(0);
+	object item;
+	while(true)
+	{
+		item = radar(AlienWorm);
+		if(item == null) continue;
+		delete(item.id);
+		radar(SpaceShip).takeoff();
+	}
+}

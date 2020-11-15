@@ -1,0 +1,15 @@
+extern void object::TAS41()
+{
+	object item;
+	errmode(0);
+	while(radar(AlienWorm)==null) wait(0.1);
+	point pos = radar(AlienWorm).position;
+	produce(pos,0,RadarStation);
+	while(true)
+	{
+		item = radar(AlienWorm);
+		if(item == null) continue;
+		delete(item.id);
+		radar(SpaceShip).takeoff();
+	}
+}

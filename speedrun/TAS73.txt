@@ -1,0 +1,23 @@
+extern void object::TAS73()
+{
+	DEL(AlienAnt);
+	DEL(AlienSpider);
+	produce(RadarStation);
+	object ship = radar(SpaceShip);
+	point p = ship.position;
+	produce(p, 0, Me);
+	object item = radar(Me);
+	delete(item.id);
+	wait(6);
+	ship.takeoff();
+}
+
+void object::DEL(int cat)
+{
+	object item;
+	while(radar(cat) != null)
+	{
+		item = radar(cat);
+		delete(item.id);
+	}
+}

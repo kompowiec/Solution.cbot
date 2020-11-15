@@ -1,0 +1,131 @@
+extern void object::Crystalium1()
+{
+
+	object item;
+	int errcode;
+	errmode(0);
+
+	if(category ==WheeledGrabber)
+	{
+		CollectTitanium3(4);
+
+		/*
+			 item = radar(PowerCell);
+			 goto(item.position); //change battery
+			 grab();
+			 grab(InFront);
+			 drop(Behind);
+			 grab(EnergyCell);
+			 drop(InFront);
+			 grab(Behind);
+			 drop(EnergyCell);
+
+			 CollectTitanium3(1);
+		 */ //if your battery runs out, uncomment this and change the number TitaniumOre in the function parameter to a smaller one. Works on my machine
+
+		//1) Build a bot factory.
+		item = radar(Titanium);
+		goto(item.position);
+		grab();
+
+		item = radar(BotFactory);
+		if(item == null) message("Waiting for BotFactory to be built.");
+		while(item == null) item = radar(BotFactory);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		drop();
+		//2) Produce a winged grab
+		item = radar(PowerCell); 
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		grab();
+
+		item = radar(WingedGrabber);
+		if(item == null) message("Waiting for WingedGrabber to be built.");
+		while(item == null) item = radar(WingedGrabber);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		drop();
+
+		//5) Build a research center next to the spaceship.
+		item = radar(PowerCell);
+		goto(item.position);
+		grab();
+
+		//6) Initiate the <defense tower research program> D.
+		item = radar(ResearchCenter);
+		if(item == null) message("Waiting for Researchcenter to be built.");
+		while(item == null) item = radar(ResearchCenter);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		drop();
+
+		item = radar(SpaceShip);
+		goto(item.position);
+	}
+	else if(category == WingedGrabber)
+	{
+		item = radar (Titanium);
+		goto(item.position);
+		grab();
+		//3) Carry a titanium cube to the highest point. TODO
+		point x (3.98, 97.68);
+		goto(x);
+		drop();
+
+		item = radar(SpaceShip);
+		goto(item.position);
+
+		item = radar(PowerCell);
+		goto(item.position);
+		grab();
+		//7) Build the defense tower next to the radar.
+		item = radar(DefenseTower);
+		if(item == null) message("Waiting for DefenseTower to be built.");
+		while(item == null) item = radar(DefenseTower);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		drop();
+		//8) When all the worms are destroyed, you can go back to your ship and take off
+		message(category + ": When all the worms are destroyed, Mission complete.");
+
+		item = radar(SpaceShip);
+		goto(item.position);
+	}
+}
+
+void object::CollectTitanium3(int ii)
+{
+	object item;
+	int errcode;
+	errmode(0);
+
+	for(int i = 0; i < ii; i++)
+	{
+		item = radar(TitaniumOre);
+		goto(item.position);
+		grab();
+
+		item = radar(Converter);
+		if(item == null) message("Waiting for Conveter to be bulid.");
+		item = radar(Converter);
+		if(item == null) message("Waiting to building Converter");
+		while(item == null) item = radar(Converter);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		drop();
+		move(-2.5);
+
+		do
+		{
+			wait(1);
+			item = radar(Titanium, 0, 45, 0, 5);
+		}
+		while ( item == null );
+		goto(item.position);
+		grab();
+
+		goto(space(position));
+		drop();
+	}
+}

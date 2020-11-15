@@ -1,0 +1,5 @@
+extern void object::TAS92()
+{
+	produce(KeyB);
+	radar(SpaceShip).takeoff();
+}

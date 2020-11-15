@@ -1,0 +1,5 @@
+extern void object::TAS71()
+{
+	produce(LeggedOrgaShooter);
+	radar(SpaceShip).takeoff();
+}

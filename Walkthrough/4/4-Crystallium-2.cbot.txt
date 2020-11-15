@@ -1,0 +1,45 @@
+extern void object::Crystallium2()
+{
+	object item;
+	int errcode;
+	errmode(0);
+
+	if(category ==WheeledGrabber)
+	{	
+	item = radar(Titanium);
+	goto(item.position);
+	grab();
+	
+	item = radar(BotFactory);
+	if(item == null) message("Waiting for BotFactory to be built.");
+	while(item == null) item = radar(BotFactory);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	drop();
+	//2) Produce a winged grab
+	item = radar(PowerCell); 
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	grab();
+	
+	item = radar(WingedShooter);
+	if(item == null) message("Waiting for WingedGrabber to be built.");
+	while(item == null) item = radar(WingedShooter);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	drop();
+	
+	item = radar(SpaceShip);
+	goto(item.position);
+	grab();
+	}
+	else if(category == WingedGrabber)
+	{
+file handle();
+		handle.open("lyingShooter.cbot.txt"); //clone this repo to files/
+		handle.close();
+		
+		message(category + ": Mission complete.");
+	}
+}
+

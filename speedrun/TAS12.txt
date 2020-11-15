@@ -1,0 +1,5 @@
+extern void object::TAS12()
+{
+	produce(ResearchCenter);
+	produce(BotFactory);
+}

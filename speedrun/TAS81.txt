@@ -1,0 +1,11 @@
+extern void object::TAS81()
+{
+	object item;
+	produce(RadarStation);
+	while(radar(AlienAnt) != null)
+	{
+		item = radar(AlienAnt);
+		delete(item.id);
+	}
+	radar(SpaceShip).takeoff();
+}

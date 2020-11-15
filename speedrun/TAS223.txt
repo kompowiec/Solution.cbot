@@ -1,0 +1,10 @@
+extern void object::TAS223()
+{
+	object item = radar(SpaceShip);
+	produce(item.position,0,WingedGrabber);
+	while(radar(Target2) != null)
+	{
+		item = radar(Target2);
+		delete(item.id);
+	}
+}

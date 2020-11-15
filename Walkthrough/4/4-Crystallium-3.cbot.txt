@@ -1,0 +1,16 @@
+extern void object::Crystallium3()
+{
+	object item;
+	point x (-235.32, -205.03);
+	goto(x);
+	wait(100);
+
+	item = radar(BlackBox);
+	goto(item.position);
+	grab(); 
+	
+	item = radar(SpaceShip);
+	goto(item.position);
+	drop();
+}
+

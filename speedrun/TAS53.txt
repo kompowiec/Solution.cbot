@@ -1,0 +1,11 @@
+extern void object::TAS53()
+{
+	object item;
+	produce(BlackBox);
+	while(radar(AlienAnt) != null)
+	{
+		item = radar(AlienAnt);
+		delete(item.id);
+	}
+	radar(SpaceShip).takeoff();
+}
