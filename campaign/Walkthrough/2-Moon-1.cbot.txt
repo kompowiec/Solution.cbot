@@ -37,7 +37,7 @@ extern void object::Moon1()
 		goto(space(position));
 		drop();
 
-		item = radar(Titanium, 0, -180, 0, 1000);
+		item = radar(Titanium, 0, -180, 0, 180);
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);
 		grab();

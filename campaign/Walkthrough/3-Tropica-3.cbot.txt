@@ -1,0 +1,180 @@
+extern void object::Tropica3()
+{
+
+	object item;
+	int errcode;
+	errmode(0);
+
+	if(category == WingedShooter)
+	{
+		//4) Build a radar station in order to see the location of the ants on the mini-map, and let the hunt begin. Be careful not to run out of energy and not to overheat the reactor of a bot while over water. If a bot falls into deep water, it explodes.
+		//preparation
+		object ant;
+		float angle;
+		float sin1;
+		object repair;
+		object power;
+		object ship;
+
+		ant=radar(AlienAnt);
+
+		//rise 30metres
+		while(altitude<30){
+			jet(1);
+		}
+		ant=radar(AlienAnt);
+
+		//main loop
+		while(radar(AlienAnt)!=null){
+			if(ant==null){
+				break;
+			}
+
+			if(temperature>0.8){
+				while(altitude!=0){
+					jet(-1);
+				}
+
+				wait(2);
+			}
+
+			if(shieldLevel<0.5){
+				repair=radar(RepairCenter);
+				goto(repair.position);
+				while(shieldLevel<1){
+					wait(1);
+				}
+			}
+
+			if(energyCell.energyLevel<0.25){
+
+				power=radar(PowerStation);
+				goto(power.position);
+				while(energyCell.energyLevel<1){
+					wait(1);
+				}
+				while(altitude<30){
+					jet(1);
+				}
+			}
+			while(altitude<20){
+				jet(1);
+			}
+			//move 20 metres ?before? ant
+			ant=radar(AlienAnt);
+			turn(direction(ant.position));
+			move(distance(position,ant.position)-20);
+
+			//descent //5 metres above ant
+			if(altitude>ant.altitude){
+				while(altitude>ant.altitude){
+					jet(-1);
+				}
+			}
+			if(altitude<ant.altitude){
+				while(altitude<ant.altitude){
+					jet(1);
+				}
+			}
+
+			turn(direction(ant.position));
+			//aim!
+			angle=(altitude*altitude)+(distance2d(position,ant.position)*distance2d(position,ant.position));
+			angle=sqrt(angle);
+			sin1=distance2d(position,ant.position)/angle;
+			angle=acos(sin1);
+			ant=radar(AlienAnt);
+			turn(direction(ant.position));
+			aim(angle);
+			fire(0.1);
+		}
+		ship=radar(SpaceShip);
+		goto(ship.position);
+	}
+	//by ofofce
+
+	else if(category ==WheeledGrabber) 
+	{
+		//1) There is a titanium cube west of your present location, near the blue flag/blue cross on your mini map. You don't need to move the cube, just build a power station right there on the spot.
+		point x (-27.98, -16.43);
+		goto(x);
+
+		item = radar(BlueFlag);
+		goto(item.position);
+
+		item = radar(PowerCell);
+		goto(item.position);
+		grab();
+
+		item = radar(PowerStation);
+		if(item == null) message("Waiting for PowerStation to be built.");
+		while(item == null) item = radar(PowerStation);
+		errcode = goto(item.position);
+		while(errcode != 0)
+		{
+			turn(direction(item.position));
+			move(distance2d(position, item.position));
+			errcode = goto(item.position);
+		}
+		while ( energyCell.energyLevel < 1 )
+		{
+			wait(1);
+		}
+		message("PowerCell loaded.");
+
+		item = radar(BotFactory);
+		if(item == null) message("Waiting for Botfactory to be built.");
+		while(item == null) item = radar(BotFactory);
+		errcode = goto(item.position);
+		while(errcode != 0)
+		{
+			turn(direction(item.position));
+			move(distance2d(position, item.position));
+			errcode = goto(item.position);
+		}
+
+		//3) Build a bot factory and a winged shooter. If this bot is destroyed by enemy fire, you will find some additional titanium cubes in a small foggy valley northwest of the spaceship. You can bring them back with the winged grabber.
+		item = radar(PowerCell); 
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		grab();
+
+		item = radar(WingedShooter);
+		if(item == null) message("Waiting for Wingedgrabber to be built.");
+		while(item == null) item = radar(WingedGrabber);
+		wait(5);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		drop();
+	}
+	else if(category ==WingedGrabber) 
+	{
+		item = radar(Titanium);
+		goto(item.position);
+		grab();
+
+		move(-6);
+
+		point x (11.32, -33.28);
+		goto(x);
+		drop();
+
+		item = radar(SpaceShip);
+		goto(item.position);
+
+		item = radar(Titanium);
+		goto(item.position);
+		grab();
+
+		move(-6);
+
+		point y (25.13, -31.40);
+		goto(y);
+		drop();
+
+		item = radar(SpaceShip);
+		goto(item.position);
+	}
+	message(category + ": Mission complete.");
+}
+
