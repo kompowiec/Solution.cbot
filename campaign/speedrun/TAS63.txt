@@ -1,5 +1,5 @@
 extern void object::TAS63()
 {
 	produce(BlackBox);
-	radar(SpaceShip).takeoff();
+	takeoff(radar(SpaceShip));
 }

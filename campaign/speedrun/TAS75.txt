@@ -6,5 +6,5 @@ extern void object::TAS75()
 		item = radar(AlienAnt);
 		delete(item.id);
 	}
-	radar(SpaceShip).takeoff();
+	takeoff(radar(SpaceShip));
 }

@@ -10,6 +10,6 @@ extern void object::TAS41()
 		item = radar(AlienWorm);
 		if(item == null) continue;
 		delete(item.id);
-		radar(SpaceShip).takeoff();
+    takeoff(radar(SpaceShip));
 	}
 }

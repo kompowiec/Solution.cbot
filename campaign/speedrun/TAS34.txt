@@ -2,7 +2,7 @@ extern void object::TAS34()
 {
 	DEL(Target2);
 	DEL(TargetBot);
-	radar(SpaceShip).takeoff();
+  takeoff(radar(SpaceShip));
 }
 
 void object::DEL(int cat)

@@ -9,7 +9,7 @@ extern void object::TAS73()
 	object item = radar(Me);
 	delete(item.id);
 	wait(6);
-	ship.takeoff();
+	takeoff(ship);
 }
 
 void object::DEL(int cat)

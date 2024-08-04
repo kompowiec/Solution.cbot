@@ -2,5 +2,5 @@ extern void object::TAS61()
 {
 	object item = radar(SpaceShip);
 	produce(item.position,0,TNT);
-	item.takeoff();
+  takeoff(item);
 }

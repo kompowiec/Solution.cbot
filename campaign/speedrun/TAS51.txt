@@ -7,5 +7,5 @@ extern void object::TAS51()
 	object item = radar(Me);
 	delete(item.id);
 	wait(6);
-	ship.takeoff();
+	takeoff(ship);
 } 
