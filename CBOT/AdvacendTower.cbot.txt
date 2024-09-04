@@ -47,7 +47,7 @@ extern void object::AdvancedTower()
 					message("PowerStation(s) are blocked!",DisplayWarning);
 					wait(30);
 				}
-				
+
 			}
 			while (item == null);
 			if (item != null){
@@ -56,7 +56,7 @@ extern void object::AdvancedTower()
 				{
 					wait(1);           
 				}
-				
+
 			}
 		}
 		else {
@@ -69,17 +69,17 @@ extern void object::AdvancedTower()
 						if (item == null) {item = radar(NuclearCell,0,360,j-5,j);}
 						j+=5;
 						if (item != null) {if (item.energyLevel <= 0.8) {
-								item = radar(WayPoint,0,1,0,1);}
+							item = radar(WayPoint,0,1,0,1);}
 						}
 						if (j >= 400){
 							j=5;
 							message("Bot Cannot find any energy cells.",DisplayInfo);
 							wait(30);
-							
+
 						}
 					}
 					while ( item == null );
-					
+
 					do{
 						err = goto(item.position);
 						if (err != 0) { 
@@ -91,13 +91,13 @@ extern void object::AdvancedTower()
 					while(err !=0 );
 					grab(InFront);     // take the new cell in front
 					drop(Behind);      // and drop it behind
-					
+
 					grab(EnergyCell);  // take the cell from the bot
 					drop(InFront);     // and drop it in front
-					
+
 					grab(Behind);      // take the new cell
 					drop(EnergyCell);  // and drop it on the bot
-					
+
 				}
 				else{ if(energyCell.energyLevel < pl ) {
 					item = radar(SpaceShip);
@@ -113,17 +113,17 @@ extern void object::AdvancedTower()
 			if (item == null) { item = radar(NuclearCell,0,360,j-5,j);}
 			j+=5;
 			if (item != null) {if (item.energyLevel <= 0.8) {
-					item = radar(WayPoint,0,1,0,1);}
+				item = radar(WayPoint,0,1,0,1);}
 			}
 			if (j >= 400){
 				j=5;
 				message("Bot Cannot find any energy cells.",DisplayInfo);
 				wait(30);
-				
+
 			}
 		}
 		while ( item == null );
-		
+
 		goto(item.position);
 		grab();
 		goto(tower.position);  
@@ -155,7 +155,7 @@ extern void object::AdvancedTower()
 					j=5;
 					wait(30);
 				}
-				
+
 			}
 			while (item == null);
 			if (item != null){
@@ -164,7 +164,7 @@ extern void object::AdvancedTower()
 					motor(-1,-0.3);
 					wait(2);
 					err=goto(item.position);
-					
+
 				}
 				while (err != 0);
 				while ( cell.energyLevel < 1 )
@@ -173,9 +173,9 @@ extern void object::AdvancedTower()
 				}
 				goto(space());
 				drop();
-				
+
 			}
-			
+
 		}
 		else{
 			goto(space());

@@ -8,18 +8,8 @@ extern void object::Moon1()
 	errmode(0);
 	if(category == WheeledGrabber)
 	{
-		item = radar(Titanium);
-		errcode = goto(item.position);
-		while(errcode != 0) errcode = goto(item.position);
-		grab();
-
-		goto(space(position));
-		drop();
-
-		item = radar(PowerCell);
-		errcode = goto(item.position);
-		while(errcode != 0) errcode = goto(item.position);
-		grab();
+		Tit();
+		Power();
 
 		item = radar(ResearchCenter);
 		if(item == null) message("Waiting for Researchcenter to be built.");
@@ -29,13 +19,7 @@ extern void object::Moon1()
 		drop();
 
 		message("Researchcenter is powered.");
-		item = radar(Titanium);
-		errcode = goto(item.position);
-		while(errcode != 0) errcode = goto(item.position);
-		grab();
-
-		goto(space(position));
-		drop();
+		Tit();
 
 		item = radar(Titanium, 0, -180, 0, 180);
 		errcode = goto(item.position);
@@ -56,11 +40,7 @@ extern void object::Moon1()
 
 		message("Titanium loaded into BotFactory");
 
-		item = radar(PowerCell);
-		errcode = goto(item.position);
-		while(errcode != 0) errcode = goto(item.position);
-		grab();
-
+		Power();
 		item = radar(WingedGrabber);
 		if(item == null) message("Waiting for Wingedgrabber to be built.");
 		while(item == null) item = radar(WingedGrabber);
@@ -97,4 +77,32 @@ extern void object::Moon1()
 		}
 	}
 	message(category + ": Mission Complete.");
+}
+
+
+void object::Tit()
+{
+	object item;
+	int i = 0;
+	int errcode = 0;
+
+	item = radar(Titanium);
+	errcode = goto(item.position);
+	while (errcode != 0)
+	{
+		errcode = goto(item.position);
+	}
+	grab();
+	goto(flatspace(position, 7.5));
+	drop();
+}
+
+
+void object::Power()
+{
+	object item;
+	item = radar(PowerCell);
+	errcode = goto(item.position);
+	while(errcode != 0) errcode = goto(item.position);
+	grab();
 }

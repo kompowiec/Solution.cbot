@@ -1,0 +1,152 @@
+extern void object::TowerSupport()
+{
+	bool manufactureCells = false; //set to true if you want the bot to also create new PowerCells if it finds none
+	float triggerLevel = 0.3; //Defense Towers at this power level will be taken care of (if they have PowerCells)
+	
+	object[] towerList = radarall(DefenseTower);
+	int[] powerList;
+	powerList[0] = PowerStation;
+	powerList[1] = PowerCaptor;
+	int[] cellList;
+	cellList[0] = PowerCell;
+	cellList[1] = NuclearCell;
+	
+	while(true)
+	{
+		for (int i = 0;i < sizeof(towerList);i++)
+		{
+			if(load != null)
+			{
+				drop();
+			}
+			CellProduction(cellList, manufactureCells);
+			
+			object facility = radar(powerList);
+			
+			if(towerList[i].energyCell != null && towerList[i].energyCell.energyLevel < triggerLevel) //handling scenarios where DefenseTower has a power source in it
+			{
+				goto(towerList[i].position);
+				grab();
+				object cell = radar(cellList);
+				if(facility != null && cell != null && distance(position,facility.position) < distance(position,cell.position)) //recharge building exists and its closer than a power cell
+				{
+					message("Going to recharge this tower's battery.");
+					goto(facility.position);
+					while(load.energyLevel <1)
+					{
+						wait(1);
+					}
+					goto(towerList[i].position);
+					drop();
+					goto(space());
+				}
+				else if(facility != null && cell != null && distance(position,facility.position) > distance(position,cell.position)) //recharge building exists but power cell is closer
+				{
+					message("Swapping for a different cell since it's closer.");
+					goto(space(towerList[i].position));
+					drop();
+					goto(cell.position);
+					grab();
+					if(load.energyLevel < 1 && load.category == PowerCell)
+					{
+						goto(facility.position);
+						while(load.energyLevel <1)
+						{
+							wait(1);
+						}
+					}
+					goto(towerList[i].position);
+					drop();
+					goto(space());
+				}
+				else if(facility == null && cell != null) //no recharge building, will use power cells on the ground
+				{
+					message("No way to recharge the batteries, have to look for a new one.");
+					goto(space(towerList[i].position));
+					drop();
+					goto(cell.position);
+					grab();
+					goto(towerList[i].position);
+					drop();
+					goto(space());
+				}
+				else if (cell == null && facility != null) //no cells on the ground, will use PowerStation/Captor
+				{
+					message("No replacement cells, will have to recharge this one.");
+					goto(facility.position);
+					while(load.energyLevel < 1)
+					{
+						wait(1);
+					}
+					goto(towerList[i].position);
+					drop();
+					goto(space());
+				}
+				else if (cell == null && facility == null) //rare case, user should enable cell production
+				{
+					message("No way to keep the tower(s) operational, set manufactureCells to true", DisplayError);
+					break;
+				}
+			}
+			else if (towerList[i].energyCell == null) //DefenseTower has no cell on it
+			{
+				object cell = radar(cellList);
+				goto(cell.position);
+				grab();
+				if(load != null and load.energyLevel == 0) //grabber took something that was next to the power cell
+				{
+					message("Grabber picked up the wrong item, correcting.");
+					    goto(space());
+					    drop();
+					    goto(cell.position);
+					    grab();
+				}
+				if(facility != null && load.energyLevel < 1 && load.category == PowerCell)
+				{
+					goto(facility.position);
+					while(load.energyLevel <1)
+					{
+						wait(1);
+					}
+				}
+				goto(towerList[i].position);
+				drop();
+				goto(space());
+			}
+		}
+	}
+}
+void object::CellProduction(int[] cellList, bool manufactureCells)
+{
+	object cell = radar(cellList);
+	if (cell == null && manufactureCells == true)
+	{
+		object cube = radar(Titanium);
+		goto(cube.position);
+		grab();
+		object make = radar(PowerPlant);
+		goto(make.position);
+		drop();
+		wait(2);
+		while(isbusy(make))
+		{
+			wait(1);
+		}
+		grab();
+		goto(space(make.position));
+		drop();
+	}
+}
+point object::CellCheck(object tower) //currently unused
+{
+	object[] cellsOnMap = radarall(PowerCell);
+	point cell;
+	for(int i = 0;i <= sizeof(cellsOnMap);i++)
+	{
+		if(cellsOnMap[i].energyLevel > load.energyLevel or cellsOnMap[i].energyLevel > tower.energyCell.energyLevel)
+		{
+			return cell = cellsOnMap[i].position;
+		} 
+	}
+	return cell = new point(9999,9999,999);
+}

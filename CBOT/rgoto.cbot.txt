@@ -1,0 +1,39 @@
+// My goto wrapper, which tries several times ("retry goto")
+//
+// This is helpful, because sometimes goto is buggy and refuses to go
+// to a perfectly accessible location or item.
+//
+// NOTE: Pass the "item" you want to approach, not "item.position"
+public int rgoto(object item) {
+  errmode(0);
+  int tries = 0, retval;
+
+  // Sometimes, trying from a different start point works
+  while((retval = goto(item.position)) != 0) {
+    if (tries++ > 5) break;
+    turn(rand() * 180 - 90);
+    move((rand() - 0.3) * tries * 2);
+  }
+
+  // If not, try going to a point facing the item, from four different
+  // directions if necessary. (This is why we want the item, not its
+  // position, so we can use its orientation.)
+  if (retval != 0) {
+    point p;
+    for (float angle = 0; angle < 360; angle += 90) {
+      p.x = item.position.x + cos(item.orientation + angle) * 3;
+      p.y = item.position.y + sin(item.orientation + angle) * 3;
+      if (angle == 270) errmode(1); // last try
+      if ((retval = goto(p)) == 0) break;
+    }
+
+    // ok, try approaching it with the motor
+    turn(direction(item.position));
+    motor(1,1); wait(2); motor(0,0);
+  }
+
+  errmode(1);
+  return retval;
+}
+
+// https://github.com/colobot/colobot/discussions/1376

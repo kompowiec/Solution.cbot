@@ -1,0 +1,40 @@
+extern void object::Build()
+{
+	//1) Build a converter with the only titanium cube available.
+	object item = radar(Titanium);
+	goto(item.position);
+	grab();
+	goto(flatspace(position, 7.5));
+	drop();
+	
+	    // Check if building a BotFactory is enabled in the current mission
+	    if (buildingenabled(BotFactory))
+	    {
+		        // Check if you can build a BotFactory
+		        if (canbuild(BotFactory))
+		        {
+			            // Build the BotFactory
+			            int buildResult = build(BotFactory);
+			
+			            // Check if building the BotFactory was successful
+			            if (buildResult == 0)
+			            {
+				                message("BotFactory successfully built.");
+				            }
+			            else
+			            {
+				                message("Failed to build BotFactory.");
+				            }
+			        }
+		        else
+		        {
+			            message("Cannot build BotFactory: prerequisite conditions not met.");
+			        }
+		    }
+	    else
+	    {
+		        message("Building a BotFactory is not enabled in this mission.");
+		    }
+}
+
+

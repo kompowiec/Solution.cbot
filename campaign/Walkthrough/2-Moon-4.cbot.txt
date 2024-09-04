@@ -9,9 +9,26 @@ extern void object::Moon4()
 	if(category == WheeledGrabber)
 	{
 		//1) Build a converter with the only titanium cube available.
-		//2) Deposit one chunk of titanium ore at a time at the center of the platform and let the converter do the rest.
-		CollectTitanium3(1);
+		item = radar(Titanium);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		grab();
+		goto(flatspace(position, 7.5));
+		drop();
+		//2) Deposit one chunk of titanium ore at a time at the center of the platform and let the converter do the rest
+		//goto(flatspace(position, 7.5));
+		item = radar(TitaniumOre);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		grab();
 		//3) Bulid a power station with one of the newly converted titanium cubes
+		item = radar(Converter);
+		if(item == null) message("Waiting for Converter to be built.");
+		while(item == null) item = radar(Converter);
+		errcode = goto(item.position);
+		while(errcode != 0) errcode = goto(item.position);
+		drop();
+		move(-2.5);
 		//4) If you don't feel like looking for the black box yourself, build a radar and the box will appear on your mini map somewhere north of your present location, at the bottom of a crater, next to a few derelict spacecraft and debris from the previous expedition.
 		//5)Place the grabbers at the center of the power station platform to recharge them. The cells should still have a little power left in them, just enough to radio-control the bots onto the platform.
 		item = radar(PowerStation);
@@ -20,12 +37,11 @@ extern void object::Moon4()
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);
 		while ( energyCell.energyLevel < 1 )
-		{wait(1);}
-		
+		wait(1);
 		CollectTitanium3(1);
 		item = radar(SpaceShip);
 		goto(item.position);
-		
+
 	}
 	else if (category == WingedGrabber)
 	{
@@ -34,8 +50,7 @@ extern void object::Moon4()
 		errcode = goto(item.position);
 		while(errcode != 0) errcode = goto(item.position);
 		while ( energyCell.energyLevel < 1 )
-		{wait(1);}
-		
+		wait(1);
 		//6)Radio-control the winged grabber to the black box and back.
 		//7) Gather both grabbers and the black box onto the spaceship platform and climb on board yourself.
 		item = radar(BlackBox);
@@ -81,7 +96,7 @@ void object::CollectTitanium3(int ii)
 		goto(item.position);
 		grab();
 		
-		goto(space(position));
+    goto(flatspace(position, 7.5));
 		drop();
 		
 		move(-6);

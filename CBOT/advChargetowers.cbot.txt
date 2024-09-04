@@ -7,7 +7,7 @@ extern void object::advChargeTowers()
 	errmode(0);
 	if (load!=null) {
 		drop();
-		
+
 	}
 	dist=0;
 	while (true) {
@@ -22,13 +22,13 @@ extern void object::advChargeTowers()
 				wait(1);
 			}
 		}
-		
+
 		tower=radar(DefenseTower,0,360,dist);
 		if (tower==null) {
 			dist=0;
 			tower=radar(DefenseTower,0,360,dist);
 		}
-		
+
 		if (tower.energyCell.energyLevel<0.3) {
 			battery=radar(PowerCell,0,360);
 			if (battery==null) {
@@ -71,14 +71,12 @@ extern void object::advChargeTowers()
 			}
 			goto(space(position,5,25));
 			drop();
-			
-			
+
+
 		} else {
 			dist=distance(tower.position,position)+1;
-			
+
 		}
 	}
-	
-	
 }
 

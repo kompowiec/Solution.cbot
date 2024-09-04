@@ -12,7 +12,6 @@ extern void object::Mission1()
 		item = radar(ResearchCenter);
 		goto(item.position);
 		drop();
-		
 		message("Research center powered - begin research.");
 	//2) Activate the research center then click on the @ <tracked bot research program> button.	
 		item = radar(PowerCell); // There are two powercells that get in the way
